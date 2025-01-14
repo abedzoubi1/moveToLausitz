@@ -6,9 +6,9 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js";
 
-const supabaseUrl = "https://nwnppjevoiqqnwegsmvr.supabase.co";
-const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53bnBwamV2b2lxcW53ZWdzbXZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUyNDg1MTYsImV4cCI6MjA1MDgyNDUxNn0.xmqYac_6EZPXOdCLrZJOhrdpHaqDaJkTGGD7zWcBGf0";
+const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+const supabaseKey = Deno.env.get("SUPABASE_KEY") || "";
+const openDataKey = Deno.env.get("OPEN_DATA_KEY") || "";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 Deno.serve(async () => {
@@ -39,7 +39,6 @@ Deno.serve(async () => {
 
 export const fetchTouristInfoCenters = async () => {
   const entityIds: string[] = (await fetchEntityIds()).flat(); // List of IDs to process
-  const apiKey = "ed541d4ad8f0acee0c592209e8fa2d26";
   interface TouristInfoCenter {
     id: string;
     type: string;
@@ -68,7 +67,7 @@ export const fetchTouristInfoCenters = async () => {
     const url = `https://proxy.opendatagermany.io/api/ts/v2/kg/things/${id}`;
     const headers = {
       "Content-Type": "application/ld+json",
-      "x-api-key": apiKey,
+      "x-api-key": openDataKey,
       "x-hop": "3",
     };
 
@@ -213,7 +212,7 @@ const extractOpeningHoursByDay = (
 const API_URL = "https://proxy.opendatagermany.io/api/ts/v2/kg/things";
 const API_HEADERS = {
   "Content-Type": "application/ld+json",
-  "x-api-key": "ed541d4ad8f0acee0c592209e8fa2d26",
+  "x-api-key": openDataKey,
 };
 const QUERY_PAYLOAD = {
   "@context": {
