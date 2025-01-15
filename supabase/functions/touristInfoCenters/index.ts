@@ -6,9 +6,11 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js";
 
-const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-const supabaseKey = Deno.env.get("SUPABASE_KEY") || "";
+const supabaseUrl = Deno.env.get("SB_URL") || "";
+const supabaseKey = Deno.env.get("SB_KEY") || "";
 const openDataKey = Deno.env.get("OPEN_DATA_KEY") || "";
+const openDataUrl = Deno.env.get("OPEN_DATA_API_URL") || "";
+
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 Deno.serve(async () => {
@@ -33,14 +35,13 @@ Deno.serve(async () => {
   curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/touristInfoCenters' \
     --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
     --header 'Content-Type: application/json' \
-    --data '{"name":"F¡unctions"}'
 
 */
 
 export const fetchTouristInfoCenters = async () => {
   const entityIds: string[] = (await fetchEntityIds()).flat(); // List of IDs to process
   interface TouristInfoCenter {
-    id: string;
+    external_id: string;
     type: string;
     name: string | null;
     address: string | null;
@@ -64,7 +65,7 @@ export const fetchTouristInfoCenters = async () => {
   const results: TouristInfoCenter[] = [];
 
   for (const id of entityIds) {
-    const url = `https://proxy.opendatagermany.io/api/ts/v2/kg/things/${id}`;
+    const url = openDataUrl + "/" + id;
     const headers = {
       "Content-Type": "application/ld+json",
       "x-api-key": openDataKey,
@@ -78,7 +79,7 @@ export const fetchTouristInfoCenters = async () => {
 
       // Extract and structure data
       const item: TouristInfoCenter = {
-        id: data["@id"].split("http://onlim.com/entity/").pop(),
+        external_id: id,
         type: data["@type"]?.join(", "),
         name:
           data["https://schema.org/name"]?.find(
@@ -132,7 +133,7 @@ export const fetchTouristInfoCenters = async () => {
       };
       await supabase
         .from("tourist_info_centers")
-        .upsert([item], { onConflict: "id" });
+        .upsert([item], { onConflict: "external_id" });
       results.push(item);
     } catch (error) {
       console.error("Error fetching data for ID:", id, error);
@@ -209,7 +210,6 @@ const extractOpeningHoursByDay = (
   return openingHoursByDay;
 };
 
-const API_URL = "https://proxy.opendatagermany.io/api/ts/v2/kg/things";
 const API_HEADERS = {
   "Content-Type": "application/ld+json",
   "x-api-key": openDataKey,
@@ -260,7 +260,7 @@ export async function fetchEntityIds() {
 
   while (true) {
     try {
-      const response = await fetch(API_URL + "?sortSeed=1", {
+      const response = await fetch(openDataUrl + "?sortSeed=1", {
         method: "POST",
         headers: {
           ...API_HEADERS,
