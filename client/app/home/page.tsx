@@ -1,9 +1,12 @@
 import Hero from "../components/hero";
+import Navbar from "../components/navbar";
 import SectionCarousel from "../components/sectionCarousel";
 
 export default function HomaPage() {
   return (
     <>
+      <Navbar />
+      <Hero />
       <div>
         <SectionCarousel
           title="Veranstaltungen"
@@ -41,7 +44,7 @@ export default function HomaPage() {
                 "https://img.ecmaps.de/remote/.jpg?project=dzt&mode=max&width=1920&height=1920&url=http://eingabe.events-in-brandenburg.de/images/itempics/6/7/9/item_793976_pic_1_orig.jpg",
             },
           ]}
-          table={"veranstaltungen"}
+          table={"events"}
         />
         <SectionCarousel
           title="Turist-Informationzentren"
@@ -83,7 +86,7 @@ export default function HomaPage() {
                 "https://img.ecmaps.de/remote/.jpg?project=dzt&mode=max&width=1920&height=1920&url=http://backoffice2.reiseland-brandenburg.de/rpcServer/public/file/get/id/542522",
             },
           ]}
-          table={"info-center"}
+          table={"tourist-info"}
         />
         <SectionCarousel
           title="Kultur"
@@ -126,7 +129,7 @@ export default function HomaPage() {
                 "https://img.ecmaps.de/remote/.jpg?project=dzt&mode=max&width=1920&height=1920&url=http://backoffice2.reiseland-brandenburg.de/rpcServer/public/file/get/id/554735",
             },
           ]}
-          table={"kulur"}
+          table={"museums"}
         />
         <SectionCarousel
           title="Wandern"
@@ -168,7 +171,7 @@ export default function HomaPage() {
                 "https://img.ecmaps.de/remote/.jpg?project=dzt&mode=max&width=1920&height=1920&url=http://backoffice2.reiseland-brandenburg.de/rpcServer/public/file/get/id/472668",
             },
           ]}
-          table={"wandern"}
+          table={"trails"}
         />
         <SectionCarousel
           title="Gastronomie"
@@ -216,7 +219,7 @@ export default function HomaPage() {
                 "https://img.ecmaps.de/remote/.jpg?project=dzt&mode=max&width=1920&height=1920&url=http://backoffice2.reiseland-brandenburg.de/rpcServer/public/file/get/id/148238",
             },
           ]}
-          table={"gastonomie"}
+          table={"food"}
         />
         <SectionCarousel
           title="Unterkünfte"
@@ -258,7 +261,7 @@ export default function HomaPage() {
                 "https://img.ecmaps.de/remote/.jpg?project=dzt&mode=max&width=1920&height=1920&url=http://backoffice2.reiseland-brandenburg.de/rpcServer/public/file/get/id/259970",
             },
           ]}
-          table={"unterkunft"}
+          table={"accommodation"}
         />
       </div>
     </>
