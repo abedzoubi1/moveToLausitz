@@ -1,10 +1,6 @@
-import { Box, Typography, Divider } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
-interface OpeningHoursProps {
-  opening_hours: { [key: string]: string[] } | null;
-}
-
-const dayTranslation: { [key: string]: string } = {
+const dayTranslations: { [key: string]: string } = {
   Monday: "Montag",
   Tuesday: "Dienstag",
   Wednesday: "Mittwoch",
@@ -24,81 +20,69 @@ const germanDayOrder = [
   "Sonntag",
 ];
 
-const formatTime = (timeString: string) => {
-  // Convert "10:00:00 - 12:00:00" to "10:00 - 12:00 Uhr"
-  return (
-    timeString
-      .split(" - ")
-      .map((t) => t.slice(0, 5)) // Take only HH:MM
-      .join(" - ") + " Uhr"
-  );
-};
+interface OpeningHoursProps {
+  opening_hours: { [key: string]: string[] } | null | string;
+}
 
 export const OpeningHours = ({ opening_hours }: OpeningHoursProps) => {
-  console.log(opening_hours);
-  // Handle null or empty input
-  if (!opening_hours || Object.keys(opening_hours).length === 0) {
+  if (!opening_hours) {
     return (
       <Typography variant="body2" color="text.secondary">
-        Keine aktuellen Öffnungszeiten verfügbar,
-        <br />
-        bitte auf der Website nachschauen.
+        Keine Öffnungszeiten verfügbar
       </Typography>
     );
   }
+  // Parse opening hours if it's a string
+  const hours =
+    typeof opening_hours === "string"
+      ? JSON.parse(opening_hours)
+      : opening_hours;
 
-  // Convert English keys to German and format times
-  const translatedHours = Object.entries(opening_hours).reduce(
-    (acc, [key, value]) => {
-      const germanDay = dayTranslation[key];
-      if (germanDay) {
-        acc[germanDay] = value.map(formatTime);
+  const formatTimeRange = (timeStr: string) => {
+    const [start, end] = timeStr.split(" - ");
+    const formatTime = (time: string) => time.replace(":00", "");
+    return `${formatTime(start)} - ${formatTime(end)} Uhr`;
+  };
+
+  const translatedHours = Object.entries(hours).reduce(
+    (acc, [day, times]) => {
+      const germanDay = dayTranslations[day];
+      if (germanDay && Array.isArray(times)) {
+        // Sort time ranges
+        const sortedTimes = [...times].sort((a, b) => {
+          const timeA = a.split(" - ")[0];
+          const timeB = b.split(" - ")[0];
+          return timeA.localeCompare(timeB);
+        });
+        acc[germanDay] = sortedTimes;
       }
       return acc;
     },
-    {} as { [key: string]: string[] }
+    {} as Record<string, string[]>
   );
 
   return (
     <Box sx={{ width: "100%" }}>
-      {/* Status Bar */}
-      <Box
-        sx={{
-          bgcolor: "grey.100",
-          p: 1.5,
-          borderRadius: 1,
-          mb: 2,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="body2" fontWeight="bold">
-          GESCHLOSSEN
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          (Öffnet um 08:00 Uhr)
-        </Typography>
-      </Box>
-
-      <Divider sx={{ my: 2 }} />
-
-      {/* Opening Hours List in German order */}
-      {germanDayOrder.map((germanDay) => (
+      {germanDayOrder.map((day) => (
         <Box
-          key={germanDay}
+          key={day}
           sx={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            mb: 1.5,
+            py: 0.75,
           }}
         >
-          <Typography variant="body2" sx={{ minWidth: 100 }}>
-            {germanDay}
+          <Typography
+            variant="body2"
+            sx={{ color: "text.primary", minWidth: "100px" }}
+          >
+            {day}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {translatedHours[germanDay]?.join(", ") || "Geschlossen"}
+            {translatedHours[day] && translatedHours[day].length > 0
+              ? translatedHours[day].map(formatTimeRange).join(", ")
+              : "Geschlossen"}
           </Typography>
         </Box>
       ))}

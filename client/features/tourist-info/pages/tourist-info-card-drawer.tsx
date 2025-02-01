@@ -23,6 +23,7 @@ import {
   LocationOn,
   Phone,
   Language,
+  Email,
 } from "@mui/icons-material";
 import { TouristInfoCenter } from "./types";
 import { ImageSlider } from "./ImageSlider";
@@ -74,16 +75,19 @@ export const TouristInfoDrawer = ({
         {/* Description */}
         <ReadMoreText text={item.description || ""} maxLines={4} />
 
-        {/* Status & Opening Hours */}
-        <Box sx={{ bgcolor: "grey.100", p: 2, borderRadius: 2, mb: 3 }}>
-          <Typography variant="body2" color="text.secondary">
-            <OpeningHours opening_hours={item.opening_hours} />
-          </Typography>
-        </Box>
-
         {/* Details List */}
         <List>
           {" "}
+          <Divider component="li" />
+          <ListItem>
+            <ListItemIcon sx={{ minWidth: 40 }}>
+              <Schedule />
+            </ListItemIcon>
+            <ListItemText
+              primary="Öffnungszeiten"
+              secondary={<OpeningHours opening_hours={item.opening_hours} />}
+            />
+          </ListItem>
           <Divider component="li" />
           <ListItem>
             <ListItemIcon sx={{ minWidth: 40 }}>
@@ -93,7 +97,7 @@ export const TouristInfoDrawer = ({
               primary="Adresse"
               secondary={
                 <Link
-                  href={`https://maps.google.com?q=${item.address}`}
+                  href={`https://maps.google.com?q=${item.address + " " + item.postal_code + " " + item.locality}`}
                   target="_blank"
                   rel="noopener"
                   sx={{
@@ -101,46 +105,75 @@ export const TouristInfoDrawer = ({
                     "&:hover": { textDecoration: "underline" },
                   }}
                 >
-                  {item.address}
+                  {item.address}, {item.postal_code} {item.locality}
                 </Link>
               }
             />
           </ListItem>
           <Divider component="li" />
-          <ListItem>
-            <ListItemIcon sx={{ minWidth: 40 }}>
-              <Phone />
-            </ListItemIcon>
-            <ListItemText
-              primary="Telefon"
-              secondary={
-                <Link
-                  href={`tel:${item.telephone}`}
-                  sx={{ textDecoration: "none" }}
-                >
-                  {item.telephone}
-                </Link>
-              }
-            />
-          </ListItem>
-          <Divider component="li" />
-          <ListItem>
-            <ListItemIcon sx={{ minWidth: 40 }}>
-              <Language />
-            </ListItemIcon>
-            <ListItemText
-              primary="Website"
-              secondary={
-                <Link
-                  href={item.url || undefined}
-                  target="_blank"
-                  rel="noopener"
-                >
-                  {item.url}
-                </Link>
-              }
-            />
-          </ListItem>
+          {/* Phone */}
+          {item.telephone && (
+            <>
+              <ListItem>
+                <ListItemIcon sx={{ minWidth: 40 }}>
+                  <Phone />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Telefon"
+                  secondary={
+                    <Link
+                      href={`tel:${item.telephone}`}
+                      sx={{ textDecoration: "none" }}
+                    >
+                      {item.telephone}
+                    </Link>
+                  }
+                />
+              </ListItem>
+              <Divider />
+            </>
+          )}
+          {/* Email */}
+          {item.email && (
+            <>
+              <ListItem>
+                <ListItemIcon sx={{ minWidth: 40 }}>
+                  <Email />
+                </ListItemIcon>
+                <ListItemText
+                  primary="E-Mail"
+                  secondary={
+                    <Link
+                      href={`mailto:${item.email}`}
+                      sx={{ textDecoration: "none" }}
+                    >
+                      {item.email}
+                    </Link>
+                  }
+                />
+              </ListItem>
+              <Divider />
+            </>
+          )}
+          {/* Website */}
+          {item.url && (
+            <>
+              <ListItem>
+                <ListItemIcon sx={{ minWidth: 40 }}>
+                  <Language />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Website"
+                  secondary={
+                    <Link href={item.url} target="_blank" rel="noopener">
+                      {item.url}
+                    </Link>
+                  }
+                />
+              </ListItem>
+              <Divider />
+            </>
+          )}
         </List>
       </Box>
     </Drawer>
