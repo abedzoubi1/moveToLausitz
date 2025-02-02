@@ -15,7 +15,7 @@ export const ImageSlider = ({ images, height = 300 }: ImageSliderProps) => {
     images?.length > 0 ? images : ["/images/defult_image.jpg"]; // Update path to use public folder
 
   const handleNext = () => {
-    setActiveStep((prev) => Math.min(prev + 1, images.length - 1));
+    setActiveStep((prev) => Math.min(prev + 1, displayImages.length - 1));
   };
 
   const handleBack = () => {
@@ -45,7 +45,7 @@ export const ImageSlider = ({ images, height = 300 }: ImageSliderProps) => {
           "&::-webkit-scrollbar": { display: "none" },
         }}
       >
-        {images.map((image, index) => (
+        {displayImages.map((image, index) => (
           <Box
             key={index}
             component="img"
@@ -63,7 +63,7 @@ export const ImageSlider = ({ images, height = 300 }: ImageSliderProps) => {
       </Box>
 
       {/* Navigation Arrows */}
-      {images.length > 1 && (
+      {displayImages.length > 1 && (
         <>
           <IconButton
             sx={{
@@ -88,7 +88,8 @@ export const ImageSlider = ({ images, height = 300 }: ImageSliderProps) => {
               transform: "translateY(-50%)",
               bgcolor: "rgba(255,255,255,0.8)",
               "&:hover": { bgcolor: "rgba(255,255,255,0.9)" },
-              visibility: activeStep < images.length - 1 ? "visible" : "hidden",
+              visibility:
+                activeStep < displayImages.length - 1 ? "visible" : "hidden",
             }}
             onClick={handleNext}
           >
@@ -98,7 +99,7 @@ export const ImageSlider = ({ images, height = 300 }: ImageSliderProps) => {
       )}
 
       {/* Dots Indicator */}
-      {images.length > 1 && (
+      {displayImages.length > 1 && (
         <Stack
           direction="row"
           spacing={1}

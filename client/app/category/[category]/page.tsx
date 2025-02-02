@@ -107,11 +107,24 @@ export default function CategoryGrid({ window }: Props) {
             sx={{
               mx: 2,
               flex: 1,
-              bgcolor: "white",
-              borderRadius: 1,
+              color: "white",
+              borderColor: "white",
+              borderRadius: 4,
+              fontSize: "1.1rem",
               "& .MuiSelect-select": {
-                py: 1,
+                padding: "8px 16px",
+                borderRadius: 4,
+                fontSize: "1.1rem",
               },
+              "& .MuiMenuItem-root": {
+                fontSize: "1.1rem",
+                bgcolor: "white",
+              },
+              "& .Mui-focused	": {
+                outline: "none",
+              },
+              border: "2px solid white",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
             }}
           >
             {categories.map((cat) => (

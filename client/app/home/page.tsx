@@ -1,3 +1,4 @@
+import Footer from "../components/footer";
 import Hero from "../components/hero";
 import Navbar from "../components/navbar";
 import SectionCarousel from "../components/sectionCarousel";
@@ -263,6 +264,7 @@ export default function HomaPage() {
           ]}
           table={"accommodation"}
         />
+        <Footer />
       </div>
     </>
   );
