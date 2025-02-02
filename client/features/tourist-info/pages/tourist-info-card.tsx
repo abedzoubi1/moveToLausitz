@@ -55,7 +55,10 @@ export const TouristInfoCard = (item: TouristInfoCenter) => {
       </Card>
       <TouristInfoDrawer
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={(e?: React.MouseEvent) => {
+          e?.stopPropagation();
+          setOpen(false);
+        }}
         item={item}
         images={imageUrls}
       />

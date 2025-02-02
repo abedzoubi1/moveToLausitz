@@ -23,23 +23,23 @@ import {
   Language,
   Email,
 } from "@mui/icons-material";
-import { TouristInfoCenter } from "./types";
 import { ImageSlider } from "./ImageSlider";
 import { ReadMoreText } from "./ReadMore";
 import { OpeningHours } from "./oppeningHouers";
-interface TouristInfoDrawerProps {
+import { cultureSpot } from "../culture/pages/types";
+interface ColtureSpotDrawerProps {
   open: boolean;
   onClose: () => void;
-  item: TouristInfoCenter;
+  item: cultureSpot;
   images: string[];
 }
 
-export const TouristInfoDrawer = ({
+export const SpotDrawer = ({
   open,
   onClose,
   item,
   images,
-}: TouristInfoDrawerProps) => {
+}: ColtureSpotDrawerProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
 
   return (
@@ -124,28 +124,6 @@ export const TouristInfoDrawer = ({
                       sx={{ textDecoration: "none" }}
                     >
                       {item.telephone}
-                    </Link>
-                  }
-                />
-              </ListItem>
-              <Divider />
-            </>
-          )}
-          {/* Email */}
-          {item.email && (
-            <>
-              <ListItem>
-                <ListItemIcon sx={{ minWidth: 40 }}>
-                  <Email />
-                </ListItemIcon>
-                <ListItemText
-                  primary="E-Mail"
-                  secondary={
-                    <Link
-                      href={`mailto:${item.email}`}
-                      sx={{ textDecoration: "none" }}
-                    >
-                      {item.email}
                     </Link>
                   }
                 />

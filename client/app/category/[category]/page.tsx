@@ -7,7 +7,6 @@ import {
   IconButton,
   Select,
   MenuItem,
-  Typography,
   Box,
   useTheme,
   useMediaQuery,
@@ -15,45 +14,41 @@ import {
   Container,
 } from "@mui/material";
 import { ArrowBack, Map } from "@mui/icons-material";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import TouristGridExample from "@/features/tourist-info/pages/tourist-info-list";
-
-interface TouristInfo {
-  id: number;
-  name: string;
-  description: string;
-  address: string;
-  locality: string;
-  postal_code: string;
-  images: string;
-  opening_hours: string;
-  telephone: string;
-  url: string;
-  distance: number;
-}
-
-interface Props {
-  params: { category: string };
-  window: () => Window;
-}
+import CulturSpotGrid from "@/features/culture/pages/culture-spot-list";
+import FoodEstablishmentsGrid from "@/features/food/pages/culture-spot-list";
+import AccommodationsGrid from "@/features/accommodation/pages/accommodation-card-list";
+import EventGrid from "@/features/events/pages/culture-spot-list";
+import TrailGrid from "@/features/trails/pages/trails-list";
 
 const categories = [
-  { value: "tourist-info", label: "Tourist Information", color: "#1e88e5" },
-  { value: "events", label: "Events", color: "#e53935" },
-  { value: "museums", label: "Museums", color: "#43a047" },
-  { value: "accommodation", label: "Accommodation", color: "#8e24aa" },
-  { value: "food", label: "Restaurants", color: "#fb8c00" },
-  { value: "trails", label: "Trails", color: "#3949ab" },
+  {
+    value: "tourist-info",
+    label: "Turist-Informationzentren",
+    color: "#1e88e5",
+  },
+  { value: "events", label: "Veranstaltungen", color: "#e53935" },
+  { value: "museums", label: "Kultur", color: "#43a047" },
+  { value: "accommodation", label: "Unterkünfte", color: "#8e24aa" },
+  { value: "food", label: "Gastronomie", color: "#fb8c00" },
+  { value: "trails", label: "Wandern", color: "#3949ab" },
 ];
+interface Props {
+  window?: () => Window;
+}
 
-export default function TouristInfoPage({ window, params }: Props) {
-  const { category } = params;
-  const [places, setPlaces] = useState<TouristInfo[]>([]);
+export default function CategoryGrid({ window }: Props) {
+  // Remove params from props
+  const params = useParams(); // Use useParams hook
+  const category = params.category as string; // Access category from params
+  const currentCategory =
+    categories.find((cat) => cat.value === category) || categories[0];
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedPlace, setSelectedPlace] = useState<TouristInfo | null>(null);
-  const [category1, setCategory] = useState(params.category);
+  const [category1, setCategory] = useState(category); // Use category from useParams
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -91,7 +86,13 @@ export default function TouristInfoPage({ window, params }: Props) {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar component="nav">
+      <AppBar
+        component="nav"
+        sx={{
+          bgcolor: currentCategory.color,
+          transition: "background-color 0.3s ease",
+        }}
+      >
         <Toolbar>
           <IconButton
             edge="start"
@@ -139,6 +140,11 @@ export default function TouristInfoPage({ window, params }: Props) {
       >
         <Toolbar />
         {category === "tourist-info" && <TouristGridExample />}
+        {category === "museums" && <CulturSpotGrid />}
+        {category === "food" && <FoodEstablishmentsGrid />}
+        {category === "events" && <EventGrid />}
+        {category === "accommodation" && <AccommodationsGrid />}
+        {category === "trails" && <TrailGrid />}
       </Container>
     </Box>
   );
