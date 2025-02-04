@@ -15,7 +15,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { ArrowBack, Map, ViewList } from "@mui/icons-material";
+import { ArrowBack, Height, Map, ViewList } from "@mui/icons-material";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import TouristGridExample from "@/features/tourist-info/pages/tourist-info-list";
@@ -48,9 +48,7 @@ export default function CategoryGrid({ window }: Props) {
   const category = params.category as string; // Access category from params
   const currentCategory =
     categories.find((cat) => cat.value === category) || categories[0];
-  const [isMapView, setIsMapView] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isMapView, setIsMapView] = useState(true);
   const [category1, setCategory] = useState(category); // Use category from useParams
   const router = useRouter();
   const theme = useTheme();
@@ -60,7 +58,6 @@ export default function CategoryGrid({ window }: Props) {
     const newCategory = event.target.value;
     setCategory(newCategory);
     router.push(`/category/${newCategory}`);
-    setIsMapView(false); // Reset to ListView when changing categories
   };
 
   const container =
@@ -70,9 +67,22 @@ export default function CategoryGrid({ window }: Props) {
     setIsMapView(!isMapView);
   };
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "background.default",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <CssBaseline />
-      <AppBar position="fixed" sx={{ bgcolor: currentCategory.color }}>
+      <AppBar
+        position="fixed"
+        sx={{
+          bgcolor: currentCategory.color,
+          height: isMobile ? "56px" : "64px",
+        }}
+      >
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <IconButton
             edge="start"

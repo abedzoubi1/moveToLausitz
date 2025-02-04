@@ -3,6 +3,10 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import L from "leaflet";
 import { Box, Drawer } from "@mui/material";
+
+const isMobile =
+  typeof window !== "undefined" ? window.innerWidth <= 600 : false;
+const appBarHeight = isMobile ? 54 : 64; // Default Material-UI AppBar height
 import { SpotDrawer } from "../shared/spot-card-drawer";
 import "leaflet/dist/leaflet.css";
 
@@ -64,7 +68,18 @@ export const MapView = ({ category, entities }: MapViewProps) => {
   };
 
   return (
-    <Box sx={{ width: "100%", height: "100vh", padding: 0, margin: 0 }}>
+    <Box
+      sx={{
+        position: "absolute",
+        top: `${appBarHeight}px`,
+        left: 0,
+        width: "100%",
+        height: `calc(100vh - ${appBarHeight}px)`,
+        padding: 0,
+        margin: 0,
+        overflow: "hidden",
+      }}
+    >
       {mapCenter && (
         <MapContainer
           center={mapCenter}
