@@ -3,6 +3,11 @@ import { Container, Grid, Box } from "@mui/material";
 import { TouristInfoCard } from "./tourist-info-card";
 import { TouristInfoCenter } from "./types";
 import { getTouristInfoSpots } from "../api/get-tourists";
+import { MapView } from "@/features/shared/map";
+
+interface TouristGridProps {
+  isMapView: boolean;
+}
 
 const TouristGrid = ({ infoCenter }: { infoCenter: TouristInfoCenter[] }) => {
   return (
@@ -32,7 +37,7 @@ const TouristGrid = ({ infoCenter }: { infoCenter: TouristInfoCenter[] }) => {
   );
 };
 
-export const TouristGridExample = () => {
+export const TouristGridExample = ({ isMapView }: TouristGridProps) => {
   const [centers, setCenters] = useState<TouristInfoCenter[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +69,11 @@ export const TouristGridExample = () => {
     return <div>Error: {error}</div>;
   }
 
-  return <TouristGrid infoCenter={centers} />;
+  return isMapView ? (
+    <MapView category={"tourist-info"} entities={centers} />
+  ) : (
+    <TouristGrid infoCenter={centers} />
+  );
 };
 
 export default TouristGridExample;

@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Container, Grid, Box } from "@mui/material";
 import { SpotCard } from "../../shared/spot-card";
-import { Event } from "./types";
-import { getEvents } from "../api/get-events";
+import { getFoodEstablishments } from "../api/get-food-establishments";
+import { foodEstablishment } from "./types";
+import { MapView } from "@/features/shared/map";
 
-const EventsG = ({ event }: { event: Event[] }) => {
+interface FoodEstablishmentsGridProps {
+  isMapView: boolean;
+}
+
+const FoodEstablishmentG = ({
+  foodEstablishments,
+}: {
+  foodEstablishments: foodEstablishment[];
+}) => {
   return (
     <Box
       sx={{
@@ -21,9 +30,14 @@ const EventsG = ({ event }: { event: Event[] }) => {
           justifyContent="center"
           alignItems="stretch"
         >
-          {event.map((event, index) => (
+          {foodEstablishments.map((foodEstablishments, index) => (
             <Grid item xs={4} sm={4} md={4} key={index}>
-              <SpotCard opening_hours={""} {...event} />
+              <SpotCard
+                type_of_trail={undefined}
+                distance={undefined}
+                is_accessible_for_free={null}
+                {...foodEstablishments}
+              />
             </Grid>
           ))}
         </Grid>
@@ -32,15 +46,17 @@ const EventsG = ({ event }: { event: Event[] }) => {
   );
 };
 
-export const EventGrid = () => {
-  const [centers, setSpots] = useState<Event[]>([]);
+export const FoodEstablishmentsGrid = ({
+  isMapView,
+}: FoodEstablishmentsGridProps) => {
+  const [centers, setSpots] = useState<foodEstablishment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCenters = async () => {
       try {
-        const data = await getEvents();
+        const data = await getFoodEstablishments();
         setSpots(data);
       } catch (err) {
         if (err instanceof Error) {
@@ -63,8 +79,11 @@ export const EventGrid = () => {
   if (error) {
     return <div>Error: {error}</div>;
   }
-
-  return <EventsG event={centers} />;
+  return isMapView ? (
+    <MapView category="food" entities={centers} />
+  ) : (
+    <FoodEstablishmentG foodEstablishments={centers} />
+  );
 };
 
-export default EventGrid;
+export default FoodEstablishmentsGrid;

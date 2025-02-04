@@ -1,4 +1,7 @@
 export interface cultureSpot {
+    type_of_trail: any;
+    distance: any;
+    email: any;
     external_id: string;
     type: string;
     name: string;

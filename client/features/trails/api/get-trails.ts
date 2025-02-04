@@ -8,7 +8,9 @@ const client = createClient(
 export const getTrails = async (): Promise<Trails[]> => {
     const response = await client
         .from("trails")
-        .select("*")
+        .select(
+            "*, start_location->>latitude , start_location->>longitude ",
+        )
         .limit(20);
 
     const { data, error } = response;

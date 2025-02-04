@@ -3,7 +3,11 @@ import { Container, Grid, Box } from "@mui/material";
 import { SpotCard } from "../../shared/spot-card";
 import { lodgingBusiness } from "./types";
 import { getAccommodation } from "../api/get-accommodations";
+import { MapView } from "@/features/shared/map";
 
+interface AccommodationGridProps {
+  isMapView: boolean;
+}
 const AccommodationG = ({
   accommodations,
 }: {
@@ -28,6 +32,8 @@ const AccommodationG = ({
           {accommodations.map((accommodations, index) => (
             <Grid item xs={4} sm={4} md={4} key={index}>
               <SpotCard
+                type_of_trail={undefined}
+                distance={undefined}
                 opening_hours={""}
                 is_accessible_for_free={null}
                 {...accommodations}
@@ -40,7 +46,7 @@ const AccommodationG = ({
   );
 };
 
-export const AccommodationsGrid = () => {
+export const AccommodationsGrid = ({ isMapView }: AccommodationGridProps) => {
   const [centers, setSpots] = useState<lodgingBusiness[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -72,7 +78,11 @@ export const AccommodationsGrid = () => {
     return <div>Error: {error}</div>;
   }
 
-  return <AccommodationG accommodations={centers} />;
+  return isMapView ? (
+    <MapView category="accommodation" entities={centers} />
+  ) : (
+    <AccommodationG accommodations={centers} />
+  );
 };
 
 export default AccommodationsGrid;

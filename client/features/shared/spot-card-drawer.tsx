@@ -22,6 +22,7 @@ import {
   Phone,
   Language,
   Email,
+  DirectionsWalk as DirectionsWalkIcon,
 } from "@mui/icons-material";
 import { ImageSlider } from "./ImageSlider";
 import { ReadMoreText } from "./ReadMore";
@@ -77,38 +78,73 @@ export const SpotDrawer = ({
         <List>
           {" "}
           <Divider component="li" />
-          <ListItem>
-            <ListItemIcon sx={{ minWidth: 40 }}>
-              <Schedule />
-            </ListItemIcon>
-            <ListItemText
-              primary="Öffnungszeiten"
-              secondary={<OpeningHours opening_hours={item.opening_hours} />}
-            />
-          </ListItem>
-          <Divider component="li" />
-          <ListItem>
-            <ListItemIcon sx={{ minWidth: 40 }}>
-              <LocationOn />
-            </ListItemIcon>
-            <ListItemText
-              primary="Adresse"
-              secondary={
-                <Link
-                  href={`https://maps.google.com?q=${item.address + " " + item.postal_code + " " + item.locality}`}
-                  target="_blank"
-                  rel="noopener"
-                  sx={{
-                    textDecoration: "none",
-                    "&:hover": { textDecoration: "underline" },
-                  }}
-                >
-                  {item.address}, {item.postal_code} {item.locality}
-                </Link>
-              }
-            />
-          </ListItem>
-          <Divider component="li" />
+          {/* Opening Hours */}
+          {item.opening_hours && (
+            <>
+              <ListItem>
+                <ListItemIcon sx={{ minWidth: 40 }}>
+                  <Schedule />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Öffnungszeiten"
+                  secondary={
+                    <OpeningHours opening_hours={item.opening_hours} />
+                  }
+                />
+              </ListItem>
+              <Divider component="li" />
+              <ListItem>
+                <ListItemIcon sx={{ minWidth: 40 }}>
+                  <LocationOn />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Adresse"
+                  secondary={
+                    <Link
+                      href={`https://maps.google.com?q=${item.address + " " + item.postal_code + " " + item.locality}`}
+                      target="_blank"
+                      rel="noopener"
+                      sx={{
+                        textDecoration: "none",
+                        "&:hover": { textDecoration: "underline" },
+                      }}
+                    >
+                      {item.address}, {item.postal_code} {item.locality}
+                    </Link>
+                  }
+                />
+              </ListItem>
+              <Divider component="li" />
+            </>
+          )}
+          {/* Distance */}
+          {item.distance && (
+            <>
+              <ListItem>
+                <ListItemIcon sx={{ minWidth: 40 }}>
+                  <LocationOn />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Entfernung"
+                  secondary={`${item.distance}`}
+                />
+              </ListItem>
+              <Divider component="li" />
+            </>
+          )}
+          {/* type of trail */}
+          {item.type_of_trail && (
+            <>
+              <ListItem>
+                <ListItemIcon sx={{ minWidth: 40 }}>
+                  <DirectionsWalkIcon />
+                </ListItemIcon>
+                <ListItemText primary="Typ" secondary={item.type_of_trail} />
+              </ListItem>
+              <Divider component="li" />
+            </>
+          )}
+          {/* Keywords */}
           {/* Phone */}
           {item.telephone && (
             <>
@@ -124,6 +160,28 @@ export const SpotDrawer = ({
                       sx={{ textDecoration: "none" }}
                     >
                       {item.telephone}
+                    </Link>
+                  }
+                />
+              </ListItem>
+              <Divider />
+            </>
+          )}
+          {/* Email */}
+          {item.email && (
+            <>
+              <ListItem>
+                <ListItemIcon sx={{ minWidth: 40 }}>
+                  <Email />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Email"
+                  secondary={
+                    <Link
+                      href={`mailto:${item.email}`}
+                      sx={{ textDecoration: "none" }}
+                    >
+                      {item.email}
                     </Link>
                   }
                 />

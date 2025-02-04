@@ -12,16 +12,19 @@ import {
   useMediaQuery,
   CssBaseline,
   Container,
+  Tooltip,
+  Typography,
 } from "@mui/material";
-import { ArrowBack, Map } from "@mui/icons-material";
+import { ArrowBack, Map, ViewList } from "@mui/icons-material";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import TouristGridExample from "@/features/tourist-info/pages/tourist-info-list";
 import CulturSpotGrid from "@/features/culture/pages/culture-spot-list";
-import FoodEstablishmentsGrid from "@/features/food/pages/culture-spot-list";
+import FoodEstablishmentsGrid from "@/features/food/pages/food-establishments-list";
 import AccommodationsGrid from "@/features/accommodation/pages/accommodation-card-list";
-import EventGrid from "@/features/events/pages/culture-spot-list";
+import EventGrid from "@/features/events/pages/events-list";
 import TrailGrid from "@/features/trails/pages/trails-list";
+import { MapView } from "@/features/shared/map";
 
 const categories = [
   {
@@ -45,7 +48,7 @@ export default function CategoryGrid({ window }: Props) {
   const category = params.category as string; // Access category from params
   const currentCategory =
     categories.find((cat) => cat.value === category) || categories[0];
-
+  const [isMapView, setIsMapView] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [category1, setCategory] = useState(category); // Use category from useParams
@@ -53,46 +56,23 @@ export default function CategoryGrid({ window }: Props) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  useEffect(() => {
-    const fetchPlaces = async () => {
-      try {
-        setLoading(true);
-
-        const position = await new Promise<GeolocationPosition>(
-          (resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject);
-          }
-        );
-        if (error) throw error;
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPlaces();
-  }, []);
-
   const handleCategoryChange = (event: any) => {
     const newCategory = event.target.value;
     setCategory(newCategory);
     router.push(`/category/${newCategory}`);
+    setIsMapView(false); // Reset to ListView when changing categories
   };
 
   const container =
     window !== undefined ? () => window().document.body : undefined;
 
+  const toggleView = () => {
+    setIsMapView(!isMapView);
+  };
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
       <CssBaseline />
-      <AppBar
-        component="nav"
-        sx={{
-          bgcolor: currentCategory.color,
-          transition: "background-color 0.3s ease",
-        }}
-      >
+      <AppBar position="fixed">
         <Toolbar>
           <IconButton
             edge="start"
@@ -106,7 +86,7 @@ export default function CategoryGrid({ window }: Props) {
             onChange={handleCategoryChange}
             sx={{
               mx: 2,
-              flex: 1,
+              minWidth: "200px",
               color: "white",
               borderColor: "white",
               borderRadius: 4,
@@ -118,10 +98,6 @@ export default function CategoryGrid({ window }: Props) {
               },
               "& .MuiMenuItem-root": {
                 fontSize: "1.1rem",
-                bgcolor: "white",
-              },
-              "& .Mui-focused	": {
-                outline: "none",
               },
               border: "2px solid white",
               boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
@@ -133,34 +109,46 @@ export default function CategoryGrid({ window }: Props) {
               </MenuItem>
             ))}
           </Select>
-
-          <IconButton>
-            <Map />
-          </IconButton>
+          <Tooltip title={isMapView ? "Liste anzeigen" : "Karte anzeigen"}>
+            <IconButton
+              onClick={toggleView}
+              color="inherit"
+              aria-label={
+                isMapView
+                  ? "Zur Listenansicht wechseln"
+                  : "Zur Kartenansicht wechseln"
+              }
+            >
+              {isMapView ? <ViewList /> : <Map />}
+            </IconButton>
+          </Tooltip>
         </Toolbar>
       </AppBar>
-
       <Container
         component="main"
         sx={{
-          pt: 8, // Add top padding
-          pb: 5, // Add bottom padding
-          px: { xs: 2, sm: 3, md: 5 }, // Responsive horizontal padding
+          pt: 8,
+          pb: isMapView ? 0 : 5,
+          px: isMapView ? 0 : { xs: 2, sm: 3, md: 5 },
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          height: "100%",
         }}
       >
-        <Toolbar />
-        {category === "tourist-info" && <TouristGridExample />}
-        {category === "museums" && <CulturSpotGrid />}
-        {category === "food" && <FoodEstablishmentsGrid />}
-        {category === "events" && <EventGrid />}
-        {category === "accommodation" && <AccommodationsGrid />}
-        {category === "trails" && <TrailGrid />}
+        {category === "tourist-info" && (
+          <TouristGridExample isMapView={isMapView} />
+        )}
+        {category === "museums" && <CulturSpotGrid isMapView={isMapView} />}
+        {category === "food" && (
+          <FoodEstablishmentsGrid isMapView={isMapView} />
+        )}
+        {category === "events" && <EventGrid isMapView={isMapView} />}
+        {category === "accommodation" && (
+          <AccommodationsGrid isMapView={isMapView} />
+        )}
+        {category === "trails" && <TrailGrid isMapView={isMapView} />}
       </Container>
     </Box>
   );
 }
-
-//create a function that parses the images from the database

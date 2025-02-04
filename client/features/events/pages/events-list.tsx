@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Container, Grid, Box } from "@mui/material";
 import { SpotCard } from "../../shared/spot-card";
-import { getFoodEstablishments } from "../api/get-food-establishments";
-import { foodEstablishment } from "./types";
+import { Event } from "./types";
+import { getEvents } from "../api/get-events";
+import { MapView } from "@/features/shared/map";
+interface EventGridProps {
+  isMapView: boolean;
+}
 
-const CulturspotG = ({
-  foodEstablishments,
-}: {
-  foodEstablishments: foodEstablishment[];
-}) => {
+const EventsG = ({ event }: { event: Event[] }) => {
   return (
     <Box
       sx={{
@@ -25,9 +25,15 @@ const CulturspotG = ({
           justifyContent="center"
           alignItems="stretch"
         >
-          {foodEstablishments.map((foodEstablishments, index) => (
+          {event.map((event, index) => (
             <Grid item xs={4} sm={4} md={4} key={index}>
-              <SpotCard is_accessible_for_free={null} {...foodEstablishments} />
+              <SpotCard
+                type_of_trail={undefined}
+                distance={undefined}
+                email={undefined}
+                opening_hours={""}
+                {...event}
+              />
             </Grid>
           ))}
         </Grid>
@@ -36,15 +42,15 @@ const CulturspotG = ({
   );
 };
 
-export const FoodEstablishmentsGrid = () => {
-  const [centers, setSpots] = useState<foodEstablishment[]>([]);
+export const EventGrid = ({ isMapView }: EventGridProps) => {
+  const [centers, setSpots] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCenters = async () => {
       try {
-        const data = await getFoodEstablishments();
+        const data = await getEvents();
         setSpots(data);
       } catch (err) {
         if (err instanceof Error) {
@@ -67,8 +73,11 @@ export const FoodEstablishmentsGrid = () => {
   if (error) {
     return <div>Error: {error}</div>;
   }
-
-  return <CulturspotG foodEstablishments={centers} />;
+  return isMapView ? (
+    <MapView category="events" entities={centers} />
+  ) : (
+    <EventsG event={centers} />
+  );
 };
 
-export default FoodEstablishmentsGrid;
+export default EventGrid;

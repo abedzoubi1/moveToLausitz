@@ -21,38 +21,11 @@ const germanDayOrder = [
 ];
 
 interface OpeningHoursProps {
-  opening_hours: { [key: string]: string | string[] } | null | string;
+  opening_hours: string | null;
 }
 
 export const OpeningHours = ({ opening_hours }: OpeningHoursProps) => {
-  // Handle different input formats
-  const parseOpeningHours = () => {
-    if (!opening_hours) return null;
-
-    try {
-      const parsed =
-        typeof opening_hours === "string"
-          ? JSON.parse(opening_hours)
-          : opening_hours;
-
-      // Convert all values to arrays
-      const normalized = Object.entries(parsed).reduce(
-        (acc, [key, value]) => {
-          acc[key] = Array.isArray(value) ? value : [value];
-          return acc;
-        },
-        {} as Record<string, string[]>
-      );
-
-      return Object.keys(normalized).length > 0 ? normalized : null;
-    } catch {
-      return null;
-    }
-  };
-
-  const hours = parseOpeningHours();
-
-  if (!hours) {
+  if (!opening_hours) {
     return (
       <Typography variant="body2" color="text.secondary">
         Keine Öffnungszeiten verfügbar
@@ -60,31 +33,35 @@ export const OpeningHours = ({ opening_hours }: OpeningHoursProps) => {
     );
   }
 
-  // Format time from "09:00:00 - 16:30:00" to "09:00 - 16:30 Uhr"
+  // Parse the JSON string
+  let parsedHours;
+  try {
+    parsedHours = JSON.parse(opening_hours);
+  } catch (error) {
+    console.error("Error parsing opening hours:", error);
+    return (
+      <Typography variant="body2" color="text.secondary">
+        Keine Öffnungszeiten verfügbar
+      </Typography>
+    );
+  }
+
   const formatTimeRange = (timeStr: string) => {
-    const [start, end] = timeStr.split(" - ");
-    const format = (t: string) => t.slice(0, 5); // Get HH:mm from HH:mm:ss
-    return `${format(start)} - ${format(end)} Uhr`;
+    const [start, end] = timeStr.split("-");
+    return `${start} - ${end} Uhr`;
   };
 
-  // Create translated hours with all German days initialized
-  const translatedHours = germanDayOrder.reduce(
-    (acc, day) => {
-      acc[day] = [];
+  // Transform to German days and format times
+  const translatedHours = Object.entries(parsedHours).reduce(
+    (acc, [day, time]) => {
+      const germanDay = dayTranslations[day];
+      if (germanDay && typeof time === "string") {
+        acc[germanDay] = time;
+      }
       return acc;
     },
-    {} as Record<string, string[]>
+    {} as Record<string, string>
   );
-
-  // Populate with actual data
-  Object.entries(hours).forEach(([englishDay, times]) => {
-    const germanDay = dayTranslations[englishDay];
-    if (germanDay) {
-      translatedHours[germanDay] = (Array.isArray(times) ? times : [times])
-        .map(formatTimeRange)
-        .sort((a, b) => a.localeCompare(b));
-    }
-  });
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -98,15 +75,12 @@ export const OpeningHours = ({ opening_hours }: OpeningHoursProps) => {
             py: 0.75,
           }}
         >
-          <Typography
-            variant="body2"
-            sx={{ color: "text.primary", minWidth: "100px" }}
-          >
+          <Typography variant="body2" sx={{ minWidth: 100 }}>
             {day}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {translatedHours[day].length > 0
-              ? translatedHours[day].join(", ")
+            {translatedHours[day]
+              ? formatTimeRange(translatedHours[day])
               : "Geschlossen"}
           </Typography>
         </Box>

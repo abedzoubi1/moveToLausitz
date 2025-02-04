@@ -3,6 +3,11 @@ import { Container, Grid, Box } from "@mui/material";
 import { SpotCard } from "../../shared/spot-card";
 import { getTrails } from "../api/get-trails";
 import { Trails, location } from "./types";
+import { MapView } from "@/features/shared/map";
+
+interface TrailGridProps {
+  isMapView: boolean;
+}
 
 const TrailG = ({ trail }: { trail: Trails[] }) => {
   return (
@@ -24,6 +29,7 @@ const TrailG = ({ trail }: { trail: Trails[] }) => {
           {trail.map((trail, index) => (
             <Grid item xs={4} sm={4} md={4} key={index}>
               <SpotCard
+                email={undefined}
                 address={trail.start_location.address}
                 locality={trail.start_location.locality}
                 postal_code={trail.start_location.postal_code}
@@ -43,7 +49,7 @@ const TrailG = ({ trail }: { trail: Trails[] }) => {
   );
 };
 
-export const TrailGrid = () => {
+export const TrailGrid = ({ isMapView }: TrailGridProps) => {
   const [centers, setSpots] = useState<Trails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +81,11 @@ export const TrailGrid = () => {
     return <div>Error: {error}</div>;
   }
 
-  return <TrailG trail={centers} />;
+  return isMapView ? (
+    <MapView category={"trails"} entities={centers} />
+  ) : (
+    <TrailG trail={centers} />
+  );
 };
 
 export default TrailGrid;

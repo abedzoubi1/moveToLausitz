@@ -3,6 +3,11 @@ import { Container, Grid, Box } from "@mui/material";
 import { SpotCard } from "../../shared/spot-card";
 import { getCulturSpots } from "../api/get-culture-spots";
 import { cultureSpot } from "./types";
+import { MapView } from "@/features/shared/map";
+
+interface CulturSpotGridProps {
+  isMapView: boolean;
+}
 
 const CulturspotG = ({ cultureSpots }: { cultureSpots: cultureSpot[] }) => {
   return (
@@ -32,7 +37,7 @@ const CulturspotG = ({ cultureSpots }: { cultureSpots: cultureSpot[] }) => {
   );
 };
 
-export const CulturSpotGrid = () => {
+export const CulturSpotGrid = ({ isMapView }: CulturSpotGridProps) => {
   const [centers, setSpots] = useState<cultureSpot[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +69,11 @@ export const CulturSpotGrid = () => {
     return <div>Error: {error}</div>;
   }
 
-  return <CulturspotG cultureSpots={centers} />;
+  return isMapView ? (
+    <MapView category="museums" entities={centers} />
+  ) : (
+    <CulturspotG cultureSpots={centers} />
+  );
 };
 
 export default CulturSpotGrid;
