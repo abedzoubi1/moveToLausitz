@@ -72,8 +72,8 @@ export default function CategoryGrid({ window }: Props) {
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
       <CssBaseline />
-      <AppBar position="fixed">
-        <Toolbar>
+      <AppBar position="fixed" sx={{ bgcolor: currentCategory.color }}>
+        <Toolbar sx={{ justifyContent: "space-between" }}>
           <IconButton
             edge="start"
             color="inherit"
@@ -88,7 +88,6 @@ export default function CategoryGrid({ window }: Props) {
               mx: 2,
               minWidth: "200px",
               color: "white",
-              borderColor: "white",
               borderRadius: 4,
               fontSize: "1.1rem",
               "& .MuiSelect-select": {

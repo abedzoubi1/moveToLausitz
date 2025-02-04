@@ -29,13 +29,13 @@ const TrailG = ({ trail }: { trail: Trails[] }) => {
           {trail.map((trail, index) => (
             <Grid item xs={4} sm={4} md={4} key={index}>
               <SpotCard
+                latitude={null}
+                longitude={null}
                 email={undefined}
                 address={trail.start_location.address}
                 locality={trail.start_location.locality}
                 postal_code={trail.start_location.postal_code}
                 country={trail.start_location.country}
-                latitude={trail.start_location.latitude}
-                longitude={trail.start_location.longitude}
                 telephone={null}
                 opening_hours={""}
                 is_accessible_for_free={null}
