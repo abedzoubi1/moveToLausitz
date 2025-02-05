@@ -13,7 +13,6 @@ import {
   CssBaseline,
   Container,
   Tooltip,
-  Typography,
 } from "@mui/material";
 import { ArrowBack, Height, Map, ViewList } from "@mui/icons-material";
 import { useParams, useRouter } from "next/navigation";
@@ -24,7 +23,6 @@ import FoodEstablishmentsGrid from "@/features/food/pages/food-establishments-li
 import AccommodationsGrid from "@/features/accommodation/pages/accommodation-card-list";
 import EventGrid from "@/features/events/pages/events-list";
 import TrailGrid from "@/features/trails/pages/trails-list";
-import { MapView } from "@/features/shared/map";
 
 const categories = [
   {
@@ -33,10 +31,10 @@ const categories = [
     color: "#1e88e5",
   },
   { value: "events", label: "Veranstaltungen", color: "#e53935" },
-  { value: "museums", label: "Kultur", color: "#43a047" },
+  { value: "museums", label: "Kultur", color: "#808080" },
   { value: "accommodation", label: "Unterkünfte", color: "#8e24aa" },
   { value: "food", label: "Gastronomie", color: "#fb8c00" },
-  { value: "trails", label: "Wandern", color: "#3949ab" },
+  { value: "trails", label: "Wandern", color: "#43a047" },
 ];
 interface Props {
   window?: () => Window;

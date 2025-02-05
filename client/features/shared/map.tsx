@@ -5,7 +5,15 @@ import L from "leaflet";
 import { Box, Drawer } from "@mui/material";
 import { SpotDrawer } from "../shared/spot-card-drawer";
 import "leaflet/dist/leaflet.css";
+import { convertImageUrlsString } from "./func";
+import "leaflet.awesome-markers";
+import "leaflet.awesome-markers/dist/leaflet.awesome-markers.css";
 
+declare module "leaflet" {
+  namespace AwesomeMarkers {
+    function icon(options: any): any;
+  }
+}
 // Dynamically import Leaflet components to prevent SSR issues
 const MapContainer = dynamic(
   () => import("react-leaflet").then((mod) => mod.MapContainer),
@@ -19,9 +27,6 @@ const Marker = dynamic(
   () => import("react-leaflet").then((mod) => mod.Marker),
   { ssr: false }
 );
-const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
-  ssr: false,
-});
 
 interface MapViewProps {
   category: keyof typeof categoryIcons;
@@ -29,12 +34,36 @@ interface MapViewProps {
 }
 
 const categoryIcons = {
-  "tourist-info": L.icon({ iconUrl: "/icons/marker.svg", iconSize: [35, 60] }),
-  museums: L.icon({ iconUrl: "/icons/marker.svg", iconSize: [35, 60] }),
-  food: L.icon({ iconUrl: "/icons/marker.svg", iconSize: [35, 60] }),
-  events: L.icon({ iconUrl: "/icons/marker.svg", iconSize: [35, 60] }),
-  accommodation: L.icon({ iconUrl: "/icons/marker.svg", iconSize: [35, 60] }),
-  trails: L.icon({ iconUrl: "/icons/marker.svg", iconSize: [35, 60] }),
+  "tourist-info": L.AwesomeMarkers.icon({
+    icon: "info",
+    markerColor: "blue",
+    prefix: "fa",
+  }),
+  museums: L.AwesomeMarkers.icon({
+    icon: "university",
+    markerColor: "lightgray",
+    prefix: "fa",
+  }),
+  food: L.AwesomeMarkers.icon({
+    icon: "cutlery",
+    markerColor: "orange",
+    prefix: "fa",
+  }),
+  events: L.AwesomeMarkers.icon({
+    icon: "calendar",
+    markerColor: "red",
+    prefix: "fa",
+  }),
+  accommodation: L.AwesomeMarkers.icon({
+    icon: "bed",
+    markerColor: "purple",
+    prefix: "fa",
+  }),
+  trails: L.AwesomeMarkers.icon({
+    icon: "tree",
+    markerColor: "green",
+    prefix: "fa",
+  }),
 };
 
 export const MapView = ({ category, entities }: MapViewProps) => {
@@ -75,6 +104,14 @@ export const MapView = ({ category, entities }: MapViewProps) => {
         overflow: "hidden",
       }}
     >
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.awesome-markers/2.0.4/leaflet.awesome-markers.css"
+      />
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+      />
       {mapCenter && (
         <MapContainer
           center={mapCenter}
@@ -91,9 +128,7 @@ export const MapView = ({ category, entities }: MapViewProps) => {
               position={[entity.latitude, entity.longitude]}
               icon={categoryIcons[category]}
               eventHandlers={{ click: () => handleMarkerClick(entity) }}
-            >
-              <Popup>{entity.name}</Popup>
-            </Marker>
+            ></Marker>
           ))}
         </MapContainer>
       )}
@@ -107,7 +142,11 @@ export const MapView = ({ category, entities }: MapViewProps) => {
             item={selectedEntity}
             onClose={handleDrawerClose}
             open={true}
-            images={[]}
+            images={convertImageUrlsString(
+              Array.isArray(selectedEntity.images)
+                ? JSON.stringify(selectedEntity.images)
+                : selectedEntity.images
+            )}
           />
         )}
       </Drawer>
