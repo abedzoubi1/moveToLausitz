@@ -5,7 +5,6 @@ import { SpotDrawer } from "./spot-card-drawer";
 import React from "react";
 
 export const SpotCard = (item: cultureSpot) => {
-  const def = "/default_image.jpg";
   const imageUrls = convertImageUrlsString(
     Array.isArray(item.images) ? JSON.stringify(item.images) : item.images
   );

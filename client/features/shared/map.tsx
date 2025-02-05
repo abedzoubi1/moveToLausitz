@@ -3,57 +3,52 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import L from "leaflet";
 import { Box, Drawer } from "@mui/material";
-
-const isMobile =
-  typeof window !== "undefined" ? window.innerWidth <= 600 : false;
-const appBarHeight = isMobile ? 54 : 64; // Default Material-UI AppBar height
 import { SpotDrawer } from "../shared/spot-card-drawer";
 import "leaflet/dist/leaflet.css";
 
+// Dynamically import Leaflet components to prevent SSR issues
 const MapContainer = dynamic(
   () => import("react-leaflet").then((mod) => mod.MapContainer),
   { ssr: false }
 );
-
 const TileLayer = dynamic(
   () => import("react-leaflet").then((mod) => mod.TileLayer),
   { ssr: false }
 );
-
 const Marker = dynamic(
   () => import("react-leaflet").then((mod) => mod.Marker),
   { ssr: false }
 );
-
 const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
   ssr: false,
 });
 
 interface MapViewProps {
   category: keyof typeof categoryIcons;
-  entities: any[]; // Replace with your entity type
+  entities: any[];
 }
 
 const categoryIcons = {
-  "tourist-info": L.icon({
-    iconUrl: "/icons/marker.svg",
-    iconSize: [35, 60],
-  }),
+  "tourist-info": L.icon({ iconUrl: "/icons/marker.svg", iconSize: [35, 60] }),
   museums: L.icon({ iconUrl: "/icons/marker.svg", iconSize: [35, 60] }),
   food: L.icon({ iconUrl: "/icons/marker.svg", iconSize: [35, 60] }),
   events: L.icon({ iconUrl: "/icons/marker.svg", iconSize: [35, 60] }),
-  accommodation: L.icon({
-    iconUrl: "/icons/marker.svg",
-    iconSize: [35, 60],
-  }),
+  accommodation: L.icon({ iconUrl: "/icons/marker.svg", iconSize: [35, 60] }),
   trails: L.icon({ iconUrl: "/icons/marker.svg", iconSize: [35, 60] }),
 };
 
 export const MapView = ({ category, entities }: MapViewProps) => {
   const [selectedEntity, setSelectedEntity] = useState<any | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    // Fix SSR issue by setting isMobile inside useEffect
+    setIsMobile(typeof window !== "undefined" && window.innerWidth <= 600);
+  }, []);
+
+  useEffect(() => {
+    // Set initial map center when entities are available
     if (entities.length > 0) {
       setMapCenter([entities[0].latitude, entities[0].longitude]);
     }
@@ -71,10 +66,10 @@ export const MapView = ({ category, entities }: MapViewProps) => {
     <Box
       sx={{
         position: "absolute",
-        top: `${appBarHeight}px`,
+        top: `${isMobile ? 54 : 64}px`, // Adjust for AppBar height
         left: 0,
         width: "100%",
-        height: `calc(100vh - ${appBarHeight}px)`,
+        height: `calc(100vh - ${isMobile ? 54 : 64}px)`,
         padding: 0,
         margin: 0,
         overflow: "hidden",
@@ -95,9 +90,7 @@ export const MapView = ({ category, entities }: MapViewProps) => {
               key={entity.id}
               position={[entity.latitude, entity.longitude]}
               icon={categoryIcons[category]}
-              eventHandlers={{
-                click: () => handleMarkerClick(entity),
-              }}
+              eventHandlers={{ click: () => handleMarkerClick(entity) }}
             >
               <Popup>{entity.name}</Popup>
             </Marker>
@@ -113,7 +106,7 @@ export const MapView = ({ category, entities }: MapViewProps) => {
           <SpotDrawer
             item={selectedEntity}
             onClose={handleDrawerClose}
-            open={false}
+            open={true}
             images={[]}
           />
         )}
