@@ -29,6 +29,7 @@ const TrailG = ({ trail }: { trail: Trails[] }) => {
           {trail.map((trail, index) => (
             <Grid item xs={4} sm={4} md={4} key={index}>
               <SpotCard
+                schedule={undefined}
                 latitude={null}
                 longitude={null}
                 email={undefined}

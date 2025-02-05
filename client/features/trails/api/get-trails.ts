@@ -9,7 +9,7 @@ export const getTrails = async (): Promise<Trails[]> => {
     const response = await client
         .from("trails")
         .select(
-            "*, start_location->>latitude , start_location->>longitude ",
+            "*, start_location->>latitude , start_location->>longitude, start_location->>address, start_location->>locality, start_location->>postal_code, start_location->>country",
         )
         .limit(20);
 

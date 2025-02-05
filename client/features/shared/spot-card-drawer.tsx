@@ -1,5 +1,5 @@
 "use client";
-import { Key, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   IconButton,
@@ -28,6 +28,7 @@ import { ImageSlider } from "./ImageSlider";
 import { ReadMoreText } from "./ReadMore";
 import { OpeningHours } from "./oppeningHouers";
 import { cultureSpot } from "../culture/pages/types";
+import { parseSchedule } from "./func";
 interface ColtureSpotDrawerProps {
   open: boolean;
   onClose: () => void;
@@ -42,7 +43,7 @@ export const SpotDrawer = ({
   images,
 }: ColtureSpotDrawerProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
-
+  console.log(item);
   return (
     <Drawer
       anchor="right"
@@ -76,23 +77,44 @@ export const SpotDrawer = ({
 
         {/* Details List */}
         <List>
-          {" "}
           <Divider component="li" />
           {/* Opening Hours */}
           {item.opening_hours && (
+            <ListItem>
+              <ListItemIcon sx={{ minWidth: 40 }}>
+                <Schedule />
+              </ListItemIcon>
+              <ListItemText
+                primary="Öffnungszeiten"
+                secondary={<OpeningHours opening_hours={item.opening_hours} />}
+              />
+              <Divider component="li" />
+            </ListItem>
+          )}
+          {/* scheduale*/}
+          {item.schedule && (
             <>
               <ListItem>
                 <ListItemIcon sx={{ minWidth: 40 }}>
                   <Schedule />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Öffnungszeiten"
-                  secondary={
-                    <OpeningHours opening_hours={item.opening_hours} />
-                  }
+                  primary="Zeitplan"
+                  secondary={parseSchedule(item.schedule).map(
+                    (entry, index) => (
+                      <Typography key={index} variant="body2" paragraph>
+                        {entry}
+                      </Typography>
+                    )
+                  )}
                 />
               </ListItem>
               <Divider component="li" />
+            </>
+          )}
+          {/* Address */}
+          {item.address && (
+            <>
               <ListItem>
                 <ListItemIcon sx={{ minWidth: 40 }}>
                   <LocationOn />
@@ -144,7 +166,6 @@ export const SpotDrawer = ({
               <Divider component="li" />
             </>
           )}
-          {/* Keywords */}
           {/* Phone */}
           {item.telephone && (
             <>
@@ -164,7 +185,7 @@ export const SpotDrawer = ({
                   }
                 />
               </ListItem>
-              <Divider />
+              <Divider component="li" />
             </>
           )}
           {/* Email */}
@@ -186,7 +207,7 @@ export const SpotDrawer = ({
                   }
                 />
               </ListItem>
-              <Divider />
+              <Divider component="li" />
             </>
           )}
           {/* Website */}

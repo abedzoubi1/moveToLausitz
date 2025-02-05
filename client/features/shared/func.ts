@@ -21,3 +21,24 @@ export const convertImageUrlsString = (
         return [];
     }
 };
+
+export const parseSchedule = (schedule: any) => {
+    if (typeof schedule === "string") {
+        try {
+            schedule = JSON.parse(schedule);
+        } catch (error) {
+            console.error("Error parsing schedule JSON:", error);
+            return ["Invalid schedule format"];
+        }
+    }
+
+    if (!Array.isArray(schedule)) {
+        console.error("Invalid schedule format:", schedule);
+        return ["Invalid schedule format"];
+    }
+
+    return schedule.map((entry) => {
+        const { day, date, month, year, time } = entry;
+        return `${day}, ${date} ${month} ${year}: ${time.start} - ${time.end} Uhr`;
+    });
+};

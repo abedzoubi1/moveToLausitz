@@ -1,4 +1,5 @@
 export interface cultureSpot {
+    schedule: any;
     type_of_trail: any;
     distance: any;
     email: any;
