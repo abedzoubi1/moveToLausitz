@@ -1,20 +1,52 @@
 "use client";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import L from "leaflet";
 import { Box, Drawer } from "@mui/material";
 import { SpotDrawer } from "../shared/spot-card-drawer";
 import "leaflet/dist/leaflet.css";
 import { convertImageUrlsString } from "./func";
-import "leaflet.awesome-markers";
 import "leaflet.awesome-markers/dist/leaflet.awesome-markers.css";
 
-declare module "leaflet" {
-  namespace AwesomeMarkers {
-    function icon(options: any): any;
-  }
-}
-// Dynamically import Leaflet components to prevent SSR issues
+// Move L and awesome-markers import into a separate function that's only called client-side
+const initializeLeaflet = async () => {
+  const L = (await import("leaflet")).default;
+  await import("leaflet.awesome-markers");
+
+  return {
+    "tourist-info": L.AwesomeMarkers.icon({
+      icon: "info",
+      markerColor: "blue",
+      prefix: "fa",
+    }),
+    museums: L.AwesomeMarkers.icon({
+      icon: "university",
+      markerColor: "cadetblue",
+      prefix: "fa",
+    }),
+    food: L.AwesomeMarkers.icon({
+      icon: "cutlery",
+      markerColor: "orange",
+      prefix: "fa",
+    }),
+    events: L.AwesomeMarkers.icon({
+      icon: "calendar",
+      markerColor: "red",
+      prefix: "fa",
+    }),
+    accommodation: L.AwesomeMarkers.icon({
+      icon: "bed",
+      markerColor: "purple",
+      prefix: "fa",
+    }),
+    trails: L.AwesomeMarkers.icon({
+      icon: "tree",
+      markerColor: "green",
+      prefix: "fa",
+    }),
+  };
+};
+
+// Dynamically import Leaflet components
 const MapContainer = dynamic(
   () => import("react-leaflet").then((mod) => mod.MapContainer),
   { ssr: false }
@@ -29,51 +61,29 @@ const Marker = dynamic(
 );
 
 interface MapViewProps {
-  category: keyof typeof categoryIcons;
+  category: string;
   entities: any[];
 }
-
-const categoryIcons = {
-  "tourist-info": L.AwesomeMarkers.icon({
-    icon: "info",
-    markerColor: "blue",
-    prefix: "fa",
-  }),
-  museums: L.AwesomeMarkers.icon({
-    icon: "university",
-    markerColor: "lightgray",
-    prefix: "fa",
-  }),
-  food: L.AwesomeMarkers.icon({
-    icon: "cutlery",
-    markerColor: "orange",
-    prefix: "fa",
-  }),
-  events: L.AwesomeMarkers.icon({
-    icon: "calendar",
-    markerColor: "red",
-    prefix: "fa",
-  }),
-  accommodation: L.AwesomeMarkers.icon({
-    icon: "bed",
-    markerColor: "purple",
-    prefix: "fa",
-  }),
-  trails: L.AwesomeMarkers.icon({
-    icon: "tree",
-    markerColor: "green",
-    prefix: "fa",
-  }),
-};
 
 export const MapView = ({ category, entities }: MapViewProps) => {
   const [selectedEntity, setSelectedEntity] = useState<any | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [categoryIcons, setCategoryIcons] = useState<any>(null);
 
   useEffect(() => {
-    // Fix SSR issue by setting isMobile inside useEffect
-    setIsMobile(typeof window !== "undefined" && window.innerWidth <= 600);
+    // Initialize Leaflet and awesome-markers only on client-side
+    initializeLeaflet().then((icons) => {
+      setCategoryIcons(icons);
+    });
+
+    // Set mobile state
+    setIsMobile(window.innerWidth <= 600);
+
+    // Handle window resize
+    const handleResize = () => setIsMobile(window.innerWidth <= 600);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -91,11 +101,14 @@ export const MapView = ({ category, entities }: MapViewProps) => {
     setSelectedEntity(null);
   };
 
+  // Don't render the map until categoryIcons are initialized
+  if (!categoryIcons) return null;
+
   return (
     <Box
       sx={{
         position: "absolute",
-        top: `${isMobile ? 54 : 64}px`, // Adjust for AppBar height
+        top: `${isMobile ? 54 : 64}px`,
         left: 0,
         width: "100%",
         height: `calc(100vh - ${isMobile ? 54 : 64}px)`,
@@ -128,7 +141,7 @@ export const MapView = ({ category, entities }: MapViewProps) => {
               position={[entity.latitude, entity.longitude]}
               icon={categoryIcons[category]}
               eventHandlers={{ click: () => handleMarkerClick(entity) }}
-            ></Marker>
+            />
           ))}
         </MapContainer>
       )}

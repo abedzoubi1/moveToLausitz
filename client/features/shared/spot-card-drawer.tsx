@@ -43,7 +43,6 @@ export const SpotDrawer = ({
   images,
 }: ColtureSpotDrawerProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
-  console.log(item);
   return (
     <Drawer
       anchor="right"
