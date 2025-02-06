@@ -6,11 +6,12 @@ import { SpotDrawer } from "../shared/spot-card-drawer";
 import "leaflet/dist/leaflet.css";
 import { convertImageUrlsString } from "./func";
 import "leaflet.awesome-markers/dist/leaflet.awesome-markers.css";
+import MarkerClusterGroup from "react-leaflet-markercluster";
 
-// Move L and awesome-markers import into a separate function that's only called client-side
 const initializeLeaflet = async () => {
   const L = (await import("leaflet")).default;
   await import("leaflet.awesome-markers");
+  await import("leaflet.markercluster");
 
   return {
     "tourist-info": L.AwesomeMarkers.icon({
@@ -105,15 +106,7 @@ export const MapView = ({ category, entities }: MapViewProps) => {
   if (!categoryIcons) return null;
 
   return (
-    <Box
-      sx={{
-        position: "absolute",
-        width: "100%",
-        height: "100%",
-        margin: 0,
-        overflow: "hidden",
-      }}
-    >
+    <>
       <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.awesome-markers/2.0.4/leaflet.awesome-markers.css"
@@ -122,44 +115,62 @@ export const MapView = ({ category, entities }: MapViewProps) => {
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
       />
-      {mapCenter && (
-        <MapContainer
-          center={mapCenter}
-          zoom={13}
-          style={{ height: "100%", width: "100%", padding: 0, margin: 0 }}
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-          {entities.map((entity) => (
-            <Marker
-              key={entity.id}
-              position={[entity.latitude, entity.longitude]}
-              icon={categoryIcons[category]}
-              eventHandlers={{ click: () => handleMarkerClick(entity) }}
-            />
-          ))}
-        </MapContainer>
-      )}
-      <Drawer
-        anchor="right"
-        open={!!selectedEntity}
-        onClose={handleDrawerClose}
+
+      <Box
+        sx={{
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          margin: 0,
+          overflow: "hidden",
+        }}
       >
-        {selectedEntity && (
-          <SpotDrawer
-            item={selectedEntity}
-            onClose={handleDrawerClose}
-            open={true}
-            images={convertImageUrlsString(
-              Array.isArray(selectedEntity.images)
-                ? JSON.stringify(selectedEntity.images)
-                : selectedEntity.images
-            )}
-          />
+        {mapCenter && (
+          <MapContainer
+            center={mapCenter}
+            zoom={13}
+            maxZoom={30}
+            style={{ height: "100%", width: "100%", padding: 0, margin: 0 }}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            <MarkerClusterGroup
+              animate={true}
+              showCoverageOnHover={true}
+              disableClusteringAtZoom={isMobile ? 13 : 14}
+            >
+              {entities.map((entity) => (
+                <Marker
+                  key={entity.id}
+                  position={[entity.latitude, entity.longitude]}
+                  icon={categoryIcons[category]}
+                  eventHandlers={{ click: () => handleMarkerClick(entity) }}
+                />
+              ))}
+            </MarkerClusterGroup>
+          </MapContainer>
         )}
-      </Drawer>
-    </Box>
+        <Drawer
+          anchor="right"
+          open={!!selectedEntity}
+          onClose={handleDrawerClose}
+        >
+          {selectedEntity && (
+            <SpotDrawer
+              item={selectedEntity}
+              onClose={handleDrawerClose}
+              open={true}
+              images={convertImageUrlsString(
+                Array.isArray(selectedEntity.images)
+                  ? JSON.stringify(selectedEntity.images)
+                  : selectedEntity.images
+              )}
+            />
+          )}
+        </Drawer>
+      </Box>
+    </>
   );
 };
