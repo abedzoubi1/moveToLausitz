@@ -118,18 +118,18 @@ export const MapView = ({ category, entities }: MapViewProps) => {
 
       <Box
         sx={{
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          margin: 0,
-          overflow: "hidden",
+          position: "fixed",
+          top: isMobile ? "56px" : "64px", // offset for the AppBar
+          bottom: 0,
+          left: 0,
+          right: 0,
         }}
       >
         {mapCenter && (
           <MapContainer
             center={mapCenter}
             zoom={13}
-            maxZoom={30}
+            maxZoom={19}
             style={{ height: "100%", width: "100%", padding: 0, margin: 0 }}
           >
             <TileLayer

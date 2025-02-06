@@ -33,6 +33,7 @@ const FoodEstablishmentG = ({
           {foodEstablishments.map((foodEstablishments, index) => (
             <Grid item xs={4} sm={4} md={4} key={index}>
               <SpotCard
+                schedule={undefined}
                 type_of_trail={undefined}
                 distance={undefined}
                 is_accessible_for_free={null}
