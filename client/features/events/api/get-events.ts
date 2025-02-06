@@ -14,8 +14,8 @@ export const getEvents = async (): Promise<Event[]> => {
     const response = await client.rpc("get_nearby_events", {
         lng: "14.060565",
         lat: "51.673550",
-        radius: "40000",
-    }).limit(10);
+        radius: "20000",
+    });
 
     const { data, error } = response;
     if (error) {

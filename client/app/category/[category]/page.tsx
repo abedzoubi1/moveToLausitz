@@ -31,7 +31,7 @@ const categories = [
     color: "#1e88e5",
   },
   { value: "events", label: "Veranstaltungen", color: "#e53935" },
-  { value: "museums", label: "Kultur", color: "#808080" },
+  { value: "museums", label: "Kultur", color: "#446979" },
   { value: "accommodation", label: "Unterkünfte", color: "#8e24aa" },
   { value: "food", label: "Gastronomie", color: "#fb8c00" },
   { value: "trails", label: "Wandern", color: "#43a047" },

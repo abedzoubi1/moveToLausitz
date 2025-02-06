@@ -6,30 +6,13 @@ const client = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 );
 export const getTouristInfoSpots = async (): Promise<TouristInfoCenter[]> => {
-    // Correct query with proper PostGIS syntax
-    //       const { data, error } = await client
-    //         .from("tourist_info_centers")
-    //         .select(
-    //           `*,
-    //   ST_Distance(
-    //     geom,
-    //     ST_SetSRID(ST_MakePoint(${position.coords.longitude}, ${position.coords.latitude}), 4326)::geography
-    //   ) AS distance_meters
-    // `
-    //         )
-    //         // .filter(
-    //         //   "ST_DWithin(geom, ST_SetSRID(ST_MakePoint(${position.coords.longitude}, ${position.coords.latitude}), 4326)::geography, 10000)",
-    //         //   "eq",
-    //         //   true
-    //         // )
-    //         .order("distance_meters", { ascending: true });
-
     // Your API call logic here
 
-    const response = await await client
-        .from("tourist_info_centers")
-        .select("*")
-        .limit(10);
+    const response = await client.rpc("get_nearby_tourist_info_centers", {
+        lng: "14.060565",
+        lat: "51.673550",
+        radius: "20000",
+    });
 
     const { data, error } = response;
     if (error) {

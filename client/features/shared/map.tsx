@@ -108,11 +108,8 @@ export const MapView = ({ category, entities }: MapViewProps) => {
     <Box
       sx={{
         position: "absolute",
-        top: `${isMobile ? 54 : 64}px`,
-        left: 0,
         width: "100%",
-        height: `calc(100vh - ${isMobile ? 54 : 64}px)`,
-        padding: 0,
+        height: "100%",
         margin: 0,
         overflow: "hidden",
       }}
