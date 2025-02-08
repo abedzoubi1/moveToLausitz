@@ -120,11 +120,8 @@ export default function CategoryGrid({ window }: Props) {
             <IconButton
               onClick={toggleView}
               color="inherit"
-              aria-label={
-                isMapView
-                  ? "Zur Listenansicht wechseln"
-                  : "Zur Kartenansicht wechseln"
-              }
+              //add lable to icon button
+              aria-label={isMapView ? "Liste" : "Karte"}
             >
               {isMapView ? <ViewList /> : <Map />}
             </IconButton>

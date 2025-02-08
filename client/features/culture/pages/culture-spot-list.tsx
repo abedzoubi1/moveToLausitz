@@ -57,7 +57,6 @@ export const CulturSpotGrid = ({ isMapView }: CulturSpotGridProps) => {
         setLoading(false);
       }
     };
-
     fetchCenters();
   }, []);
 
