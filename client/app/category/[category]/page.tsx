@@ -48,6 +48,10 @@ export default function CategoryGrid({ window }: Props) {
     categories.find((cat) => cat.value === category) || categories[0];
   const [isMapView, setIsMapView] = useState(true);
   const [category1, setCategory] = useState(category); // Use category from useParams
+  const [currentLocation, setCurrentLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
