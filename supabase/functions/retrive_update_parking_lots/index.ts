@@ -44,9 +44,21 @@ async function process_parking_lots() {
   const supabase = createClient(supabaseURL, supabaseKey);
   const parkingLots = await get_parking_lots();
   // Insert or update the parking lots in the database
-  await supabase.from("parking_lots").upsert(parkingLots, {
-    onConflict: "external_id",
-  });
+  for (const element of parkingLots) {
+    const { data, error } = await supabase
+      .from("parking_lots")
+      .update({
+        free_spots: element.free_spots,
+      })
+      .eq("external_id", element.external_id);
+
+    if (error) {
+      console.error("Update failed for", element.external_id, error);
+    } else {
+      console.log("Updated", element.external_id, data);
+    }
+  }
+
   return parkingLots;
 }
 async function get_parking_lots() {
@@ -75,7 +87,7 @@ async function get_parking_lots() {
     const latestHit = lot.latest_hit.hits.hits[0]._source;
     const id = lot.latest_hit.hits.hits[0]._id;
     return {
-      external_id: id, // Use the `id` field from the source
+      external_id: latestHit.name, // Use the `id` field from the source
       name: latestHit.name,
       latitude: latestHit.lat,
       longitude: latestHit.lon,
