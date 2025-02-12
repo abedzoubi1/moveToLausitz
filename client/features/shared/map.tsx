@@ -167,6 +167,10 @@ export const MapView = ({ category, entities }: MapViewProps) => {
                   ? JSON.stringify(selectedEntity.images)
                   : selectedEntity.images
               )}
+              currentCoords={{
+                lon: 14.332868,
+                lat: 51.67355,
+              }}
             />
           )}
         </Drawer>

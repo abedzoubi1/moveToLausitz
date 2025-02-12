@@ -13,6 +13,7 @@ import {
   Toolbar,
   Link,
   Drawer,
+  Button,
 } from "@mui/material";
 import {
   Favorite,
@@ -34,6 +35,7 @@ interface ColtureSpotDrawerProps {
   onClose: () => void;
   item: cultureSpot;
   images: string[];
+  currentCoords: { lat: number; lon: number };
 }
 
 export const SpotDrawer = ({
@@ -41,8 +43,11 @@ export const SpotDrawer = ({
   onClose,
   item,
   images,
+  currentCoords,
 }: ColtureSpotDrawerProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
+  const navigationHref = `/navigation?currentLat=${currentCoords.lat}&currentLon=${currentCoords.lon}&goalLat=${item.latitude}&goalLon=${item.longitude}`;
+
   return (
     <Drawer
       anchor="right"
@@ -63,9 +68,7 @@ export const SpotDrawer = ({
           </IconButton>
         </Toolbar>
       </AppBar>
-
       <ImageSlider images={images} />
-
       <Box sx={{ p: 3 }}>
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>
           {item.name}
@@ -229,6 +232,38 @@ export const SpotDrawer = ({
             </>
           )}
         </List>
+      </Box>
+      <Box
+        sx={{
+          position: "fixed",
+          bottom: 24,
+          right: 24,
+          zIndex: 1300,
+          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+        }}
+      >
+        <Button
+          variant="contained"
+          component={Link}
+          href={navigationHref}
+          sx={{
+            bgcolor: "rgb(145, 193, 84)",
+            color: "white",
+            fontSize: "1.2rem",
+            fontWeight: "bold",
+            borderRadius: 2,
+            textTransform: "none",
+            px: 4,
+            py: 2,
+            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+            "&:hover": {
+              bgcolor: "rgb(130, 173, 77)",
+              boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.3)",
+            },
+          }}
+        >
+          Anreise
+        </Button>
       </Box>
     </Drawer>
   );

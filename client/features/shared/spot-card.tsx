@@ -59,6 +59,10 @@ export const SpotCard = (item: cultureSpot) => {
         }}
         item={item}
         images={imageUrls}
+        currentCoords={{
+          lon: 14.332868,
+          lat: 51.67355,
+        }}
       />
     </Card>
   );
