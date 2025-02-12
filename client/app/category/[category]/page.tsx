@@ -62,9 +62,6 @@ export default function CategoryGrid({ window }: Props) {
     router.push(`/category/${newCategory}`);
   };
 
-  const container =
-    window !== undefined ? () => window().document.body : undefined;
-
   const toggleView = () => {
     setIsMapView(!isMapView);
   };

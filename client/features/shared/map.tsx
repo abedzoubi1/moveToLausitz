@@ -60,6 +60,9 @@ const Marker = dynamic(
   () => import("react-leaflet").then((mod) => mod.Marker),
   { ssr: false }
 );
+const MarkerCluster = dynamic(() => import("react-leaflet-markercluster"), {
+  ssr: false,
+});
 
 interface MapViewProps {
   category: string;
