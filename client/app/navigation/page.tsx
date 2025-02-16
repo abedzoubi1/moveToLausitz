@@ -14,9 +14,11 @@ import {
   ListItemText,
   Box,
   useMediaQuery,
+  Container,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { createClient } from "@supabase/supabase-js";
+import { m } from "framer-motion";
 
 // Create a custom MUI theme (customize as needed)
 const theme = createTheme();
@@ -119,50 +121,56 @@ export default function NavigationPage() {
   );
 
   return (
-    <ThemeProvider theme={theme}>
-      <div
-        style={{
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <Box sx={{ display: "flex", flexGrow: 1 }}>
-          {/* Drawer: permanent for desktop, temporary for mobile */}
-          {isMobile ? (
-            <Drawer
-              variant="temporary"
-              open={drawerOpen}
-              onClose={toggleDrawer}
-              ModalProps={{ keepMounted: true }}
-            >
-              {drawerContent}
-            </Drawer>
+    <div
+      style={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <Box sx={{ display: "flex", flexGrow: 1 }}>
+        {/* Drawer: permanent for desktop, temporary for mobile */}
+        {isMobile ? (
+          <Drawer
+            variant="temporary"
+            open={drawerOpen}
+            onClose={toggleDrawer}
+            ModalProps={{ keepMounted: true }}
+          >
+            {drawerContent}
+          </Drawer>
+        ) : (
+          <Drawer variant="permanent" anchor="left" open>
+            {drawerContent}
+          </Drawer>
+        )}
+        <Box
+          sx={{
+            flexGrow: 1,
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+          }}
+        >
+          {userLocation && attractionLocation ? (
+            <MapComponent
+              userLocation={userLocation}
+              attractionLocation={attractionLocation}
+              onRouteFound={handleRouteFound}
+            />
           ) : (
-            <Drawer variant="permanent" anchor="left" open>
-              {drawerContent}
-            </Drawer>
+            <Box p={2}>
+              <Typography variant="h6">Missing Coordinates</Typography>
+              <Typography variant="body1">
+                Please provide <code>currentLat</code>, <code>currentLon</code>,
+                <code>goalLat</code> and <code>goalLon</code> in the URL query.
+              </Typography>
+            </Box>
           )}
-          <Box sx={{ flexGrow: 1 }}>
-            {userLocation && attractionLocation ? (
-              <MapComponent
-                userLocation={userLocation}
-                attractionLocation={attractionLocation}
-                onRouteFound={handleRouteFound}
-              />
-            ) : (
-              <Box p={2}>
-                <Typography variant="h6">Missing Coordinates</Typography>
-                <Typography variant="body1">
-                  Please provide <code>currentLat</code>,{" "}
-                  <code>currentLon</code>,<code>goalLat</code> and{" "}
-                  <code>goalLon</code> in the URL query.
-                </Typography>
-              </Box>
-            )}
-          </Box>
         </Box>
-      </div>
-    </ThemeProvider>
+      </Box>
+    </div>
   );
 }
