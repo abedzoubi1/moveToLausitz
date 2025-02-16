@@ -7,6 +7,24 @@ import "leaflet/dist/leaflet.css";
 import { convertImageUrlsString } from "./func";
 import "leaflet.awesome-markers/dist/leaflet.awesome-markers.css";
 import MarkerClusterGroup from "react-leaflet-markercluster";
+import { useMap } from "react-leaflet";
+import L from "leaflet";
+
+const CustomZoomControl = ({
+  position = "bottomright",
+}: {
+  position?: L.ControlPosition;
+}) => {
+  const map = useMap();
+  useEffect(() => {
+    const zoomControl = L.control.zoom({ position });
+    zoomControl.addTo(map);
+    return () => {
+      zoomControl.remove();
+    };
+  }, [map, position]);
+  return null;
+};
 
 const initializeLeaflet = async () => {
   const L = (await import("leaflet")).default;
@@ -133,12 +151,16 @@ export const MapView = ({ category, entities }: MapViewProps) => {
             center={mapCenter}
             zoom={13}
             maxZoom={19}
+            zoomControl={false}
             style={{ height: "100%", width: "100%", padding: 0, margin: 0 }}
           >
+            <CustomZoomControl position="bottomright" />
+
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
+
             <MarkerClusterGroup
               animate={true}
               showCoverageOnHover={true}

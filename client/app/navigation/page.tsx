@@ -1,11 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import dynamic from "next/dynamic";
-import { useSearchParams } from "next/navigation";
 import {
-  AppBar,
-  Toolbar,
   IconButton,
   Drawer,
   Typography,
@@ -14,23 +11,22 @@ import {
   ListItemText,
   Box,
   useMediaQuery,
-  Container,
 } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { createClient } from "@supabase/supabase-js";
-import { m } from "framer-motion";
+import { createTheme } from "@mui/material/styles";
+import { ArrowBack } from "@mui/icons-material";
+import { useSearchParams, useRouter } from "next/navigation";
 
-// Create a custom MUI theme (customize as needed)
 const theme = createTheme();
 
-// Dynamically import the MapComponent to avoid SSR issues with Leaflet.
 const MapComponent = dynamic(
   () => import("../../features/shared/navigation-map"),
   { ssr: false }
 );
+
 export default function NavigationPage() {
-  // Extract coordinates from the URL query parameters.
   const searchParams = useSearchParams();
+  const router = useRouter();
+
   const currentLat = searchParams.get("currentLat")
     ? Number(searchParams.get("currentLat"))
     : undefined;
@@ -44,7 +40,6 @@ export default function NavigationPage() {
     ? Number(searchParams.get("goalLon"))
     : undefined;
 
-  // Validate and construct coordinate arrays.
   const userLocation: [number, number] | null =
     currentLat !== undefined && currentLon !== undefined
       ? [currentLat, currentLon]
@@ -52,11 +47,6 @@ export default function NavigationPage() {
   const attractionLocation: [number, number] | null =
     goalLat !== undefined && goalLon !== undefined ? [goalLat, goalLon] : null;
 
-  // State to hold the parking location returned from Supabase.
-  const [parkingLocation, setParkingLocation] = useState<
-    [number, number] | null
-  >(null);
-  // Define a type for route details.
   interface RouteDetails {
     driving: {
       distance: number;
@@ -68,19 +58,10 @@ export default function NavigationPage() {
     };
   }
 
-  // State to hold route details (e.g. distance, time) for display.
   const [routeDetails, setRouteDetails] = useState<RouteDetails | null>(null);
-  // State to control the MUI Drawer (for mobile devices).
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  // Use media queries for responsive design.
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // Initialize Supabase client using environment variables.
-
-  // If the attraction (goal) coordinates are available, call the Supabase RPC.
-
-  // Callback to receive route details from the MapComponent.
   const handleRouteFound = (details: RouteDetails) => {
     setRouteDetails(details);
   };
@@ -90,9 +71,10 @@ export default function NavigationPage() {
   };
 
   // Content for the Drawer – displays route details if available.
+  // Removed the back IconButton from here.
   const drawerContent = (
-    <Box sx={{ width: isMobile ? 250 : 300, p: 2 }}>
-      <Typography variant="h6" gutterBottom>
+    <Box sx={{ width: isMobile ? 250 : 300, p: 2, pt: 8 }}>
+      <Typography variant="h6" sx={{ mt: 2 }} gutterBottom>
         Route Details
       </Typography>
       {routeDetails ? (
@@ -128,8 +110,26 @@ export default function NavigationPage() {
         flexDirection: "column",
       }}
     >
+      {/* Back button fixed to top-left of the viewport */}
+      <IconButton
+        edge="start"
+        sx={{
+          position: "fixed",
+          top: 16,
+          left: 16,
+          zIndex: 1300,
+          bgcolor: "background.paper",
+          boxShadow: 1,
+          "&:hover": {
+            bgcolor: "action.hover",
+          },
+        }}
+        color="inherit"
+        onClick={() => router.back()}
+      >
+        <ArrowBack />
+      </IconButton>
       <Box sx={{ display: "flex", flexGrow: 1 }}>
-        {/* Drawer: permanent for desktop, temporary for mobile */}
         {isMobile ? (
           <Drawer
             variant="temporary"
@@ -146,7 +146,6 @@ export default function NavigationPage() {
         )}
         <Box
           sx={{
-            flexGrow: 1,
             position: "fixed",
             top: 0,
             left: 0,

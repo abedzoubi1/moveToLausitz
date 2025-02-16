@@ -30,6 +30,8 @@ import { ReadMoreText } from "./ReadMore";
 import { OpeningHours } from "./oppeningHouers";
 import { cultureSpot } from "../culture/pages/types";
 import { parseSchedule } from "./func";
+import { useRouter } from "next/navigation";
+
 interface ColtureSpotDrawerProps {
   open: boolean;
   onClose: () => void;
@@ -47,6 +49,7 @@ export const SpotDrawer = ({
 }: ColtureSpotDrawerProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const navigationHref = `/navigation?currentLat=${currentCoords.lat}&currentLon=${currentCoords.lon}&goalLat=${item.latitude}&goalLon=${item.longitude}`;
+  const router = useRouter(); // initialize router from next/navigation
 
   return (
     <Drawer
@@ -244,8 +247,7 @@ export const SpotDrawer = ({
       >
         <Button
           variant="contained"
-          component={Link}
-          href={navigationHref}
+          onClick={() => router.push(navigationHref)}
           sx={{
             bgcolor: "rgb(145, 193, 84)",
             color: "white",
