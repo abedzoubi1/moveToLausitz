@@ -13,8 +13,21 @@ import {
   CssBaseline,
   Container,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button as MUIButton,
 } from "@mui/material";
-import { ArrowBack, Height, Map, ViewList } from "@mui/icons-material";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import {
+  ArrowBack,
+  FilterList,
+  Height,
+  Map,
+  ViewList,
+} from "@mui/icons-material";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import TouristGridExample from "@/features/tourist-info/pages/tourist-info-list";
@@ -36,25 +49,94 @@ const categories = [
   { value: "food", label: "Gastronomie", color: "#fb8c00" },
   { value: "trails", label: "Wandern", color: "#43a047" },
 ];
+
+interface Suggestion {
+  label: string;
+  lat: number;
+  lon: number;
+  id: string;
+}
+
+interface FilterState {
+  address: string;
+  location: {
+    lat: number;
+    lng: number;
+  } | null;
+  suggestion: Suggestion | null;
+}
+
 interface Props {
   window?: () => Window;
 }
 
 export default function CategoryGrid({ window }: Props) {
-  // Remove params from props
-  const params = useParams(); // Use useParams hook
-  const category = params.category as string; // Access category from params
+  const params = useParams();
+  const category = params.category as string;
   const currentCategory =
     categories.find((cat) => cat.value === category) || categories[0];
   const [isMapView, setIsMapView] = useState(true);
-  const [category1, setCategory] = useState(category); // Use category from useParams
-  const [currentLocation, setCurrentLocation] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
+  const [category1, setCategory] = useState(category);
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  // Filter state
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [filterState, setFilterState] = useState<FilterState>({
+    address: "",
+    location: null,
+    suggestion: null,
+  });
+
+  const NEXT_PUBLIC_locationiq_api_key =
+    process.env.NEXT_PUBLIC_locationiq_api_key;
+
+  const fetchSuggestions = async (query: string) => {
+    if (!query) {
+      setSuggestions([]);
+      return;
+    }
+    try {
+      const response = await fetch(
+        `https://us1.locationiq.com/v1/autocomplete.php?key=${NEXT_PUBLIC_locationiq_api_key}&q=${encodeURIComponent(
+          query
+        )}&viewbox=13.5,51.0,14.5,52.0&bounded=1&limit=5&format=json`
+      );
+      const data = await response.json();
+
+      if (Array.isArray(data)) {
+        const uniqueSuggestions = data.map((item: any) => ({
+          label: item.display_name,
+          lat: Number(item.lat),
+          lon: Number(item.lon),
+          id: `${item.place_id || Math.random().toString(36).substr(2, 9)}`,
+        }));
+
+        const filteredSuggestions = uniqueSuggestions.filter(
+          (suggestion, index, self) =>
+            index === self.findIndex((s) => s.label === suggestion.label)
+        );
+
+        setSuggestions(filteredSuggestions);
+      } else {
+        console.warn("Unexpected API response format:", data);
+        setSuggestions([]);
+      }
+    } catch (error) {
+      console.error("Error fetching address suggestions:", error);
+      setSuggestions([]);
+    }
+  };
+
+  const openFilter = () => setIsFilterOpen(true);
+  const closeFilter = () => setIsFilterOpen(false);
+
+  const applyFilter = () => {
+    // Only close the dialog, maintaining the filter state
+    closeFilter();
+  };
 
   const handleCategoryChange = (event: any) => {
     const newCategory = event.target.value;
@@ -65,6 +147,32 @@ export default function CategoryGrid({ window }: Props) {
   const toggleView = () => {
     setIsMapView(!isMapView);
   };
+
+  const handleAddressChange = (event: any, newValue: any) => {
+    if (typeof newValue !== "string" && newValue != null) {
+      setFilterState({
+        address: newValue.label,
+        location: { lat: newValue.lat, lng: newValue.lon },
+        suggestion: newValue,
+      });
+    } else if (newValue === null) {
+      // Clear the filter when the user removes the selection
+      setFilterState({
+        address: "",
+        location: null,
+        suggestion: null,
+      });
+    }
+  };
+
+  const handleInputChange = (event: any, newInputValue: string) => {
+    setFilterState((prev) => ({
+      ...prev,
+      address: newInputValue,
+    }));
+    fetchSuggestions(newInputValue);
+  };
+
   return (
     <Box
       sx={{
@@ -117,16 +225,22 @@ export default function CategoryGrid({ window }: Props) {
               </MenuItem>
             ))}
           </Select>
-          <Tooltip title={isMapView ? "Liste anzeigen" : "Karte anzeigen"}>
-            <IconButton
-              onClick={toggleView}
-              color="inherit"
-              //add lable to icon button
-              aria-label={isMapView ? "Liste" : "Karte"}
-            >
-              {isMapView ? <ViewList /> : <Map />}
-            </IconButton>
-          </Tooltip>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Tooltip title="Filter">
+              <IconButton color="inherit" onClick={openFilter}>
+                <FilterList />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={isMapView ? "Liste anzeigen" : "Karte anzeigen"}>
+              <IconButton
+                onClick={toggleView}
+                color="inherit"
+                aria-label={isMapView ? "Liste" : "Karte"}
+              >
+                {isMapView ? <ViewList /> : <Map />}
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Toolbar>
       </AppBar>
       <Container
@@ -154,6 +268,46 @@ export default function CategoryGrid({ window }: Props) {
         )}
         {category === "trails" && <TrailGrid isMapView={isMapView} />}
       </Container>
+      <Dialog open={isFilterOpen} onClose={closeFilter} fullWidth maxWidth="sm">
+        <DialogTitle sx={{ bgcolor: "rgb(145, 193, 84)", color: "white" }}>
+          Filter
+        </DialogTitle>
+        <DialogContent sx={{ p: 3 }}>
+          <Autocomplete
+            freeSolo
+            options={suggestions}
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option.label
+            }
+            value={filterState.suggestion || filterState.address}
+            onChange={handleAddressChange}
+            onInputChange={handleInputChange}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                sx={{ mt: 2 }}
+                label="Address"
+                variant="outlined"
+              />
+            )}
+          />
+        </DialogContent>
+        <DialogActions>
+          <MUIButton onClick={closeFilter} color="primary">
+            Close
+          </MUIButton>
+          <MUIButton
+            onClick={applyFilter}
+            variant="contained"
+            sx={{
+              bgcolor: "rgb(145, 193, 84)",
+              "&:hover": { bgcolor: "rgb(130, 173, 77)" },
+            }}
+          >
+            Apply
+          </MUIButton>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

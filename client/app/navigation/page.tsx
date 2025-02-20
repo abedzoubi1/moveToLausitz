@@ -116,7 +116,7 @@ export default function NavigationPage() {
         sx={{
           position: "fixed",
           top: 16,
-          left: 16,
+          left: 25,
           zIndex: 1300,
           bgcolor: "background.paper",
           boxShadow: 1,
