@@ -4,6 +4,7 @@ import { SpotCard } from "../../shared/spot-card";
 import { getCulturSpots } from "../api/get-culture-spots";
 import { cultureSpot } from "./types";
 import { MapView } from "@/features/shared/map";
+import { useFilter } from "@/context/FilterContext";
 
 interface CulturSpotGridProps {
   isMapView: boolean;
@@ -41,11 +42,15 @@ export const CulturSpotGrid = ({ isMapView }: CulturSpotGridProps) => {
   const [centers, setSpots] = useState<cultureSpot[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { filterState } = useFilter();
 
   useEffect(() => {
     const fetchCenters = async () => {
       try {
-        const data = await getCulturSpots();
+        const data = await getCulturSpots(
+          filterState.location!.lng,
+          filterState.location!.lat
+        );
         setSpots(data);
       } catch (err) {
         if (err instanceof Error) {
@@ -58,7 +63,7 @@ export const CulturSpotGrid = ({ isMapView }: CulturSpotGridProps) => {
       }
     };
     fetchCenters();
-  }, []);
+  }, [filterState]);
 
   if (loading) {
     return <div>Loading...</div>;

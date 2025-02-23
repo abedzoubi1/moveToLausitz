@@ -74,7 +74,7 @@ export const AccommodationsGrid = ({ isMapView }: AccommodationGridProps) => {
     };
 
     fetchCenters();
-  }, []);
+  }, [filterState]);
 
   if (loading) {
     return <div>Loading...</div>;

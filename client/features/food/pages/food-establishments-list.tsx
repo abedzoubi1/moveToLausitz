@@ -4,6 +4,7 @@ import { SpotCard } from "../../shared/spot-card";
 import { getFoodEstablishments } from "../api/get-food-establishments";
 import { foodEstablishment } from "./types";
 import { MapView } from "@/features/shared/map";
+import { useFilter } from "@/context/FilterContext";
 
 interface FoodEstablishmentsGridProps {
   isMapView: boolean;
@@ -53,11 +54,15 @@ export const FoodEstablishmentsGrid = ({
   const [centers, setSpots] = useState<foodEstablishment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { filterState } = useFilter();
 
   useEffect(() => {
     const fetchCenters = async () => {
       try {
-        const data = await getFoodEstablishments();
+        const data = await getFoodEstablishments(
+          filterState.location!.lng,
+          filterState.location!.lat
+        );
         setSpots(data);
       } catch (err) {
         if (err instanceof Error) {
@@ -71,7 +76,7 @@ export const FoodEstablishmentsGrid = ({
     };
 
     fetchCenters();
-  }, []);
+  }, [filterState]);
 
   if (loading) {
     return <div>Loading...</div>;
