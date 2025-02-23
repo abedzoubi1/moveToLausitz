@@ -1,4 +1,3 @@
-//// filepath: /Users/abdelrazekzoubi/Desktop/Dev-Thesis/moveToLausitz/client/app/category/[category]/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -75,6 +74,16 @@ export default function CategoryGrid({ window }: Props) {
   const NEXT_PUBLIC_locationiq_api_key =
     process.env.NEXT_PUBLIC_locationiq_api_key;
 
+  // Temporary state for filter inputs
+  const [tempAddress, setTempAddress] = useState<string>(filterState.address);
+  const [tempLocation, setTempLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(filterState.location);
+  const [tempSuggestion, setTempSuggestion] = useState<any>(
+    filterState.suggestion
+  );
+
   const fetchSuggestions = async (query: string) => {
     if (!query) {
       setSuggestions([]);
@@ -87,7 +96,6 @@ export default function CategoryGrid({ window }: Props) {
         )}&viewbox=13.5,51.0,14.5,52.0&bounded=1&limit=5&format=json`
       );
       const data = await response.json();
-
       if (Array.isArray(data)) {
         const uniqueSuggestions = data.map((item: any) => ({
           label: item.display_name,
@@ -95,12 +103,10 @@ export default function CategoryGrid({ window }: Props) {
           lon: Number(item.lon),
           id: `${item.place_id || Math.random().toString(36).substr(2, 9)}`,
         }));
-
         const filteredSuggestions = uniqueSuggestions.filter(
           (suggestion, index, self) =>
             index === self.findIndex((s) => s.label === suggestion.label)
         );
-
         setSuggestions(filteredSuggestions);
       } else {
         console.warn("Unexpected API response format:", data);
@@ -115,8 +121,15 @@ export default function CategoryGrid({ window }: Props) {
   const openFilter = () => setIsFilterOpen(true);
   const closeFilter = () => setIsFilterOpen(false);
 
+  // When Apply is clicked, update the global filter
   const applyFilter = () => {
+    setFilterState({
+      address: tempAddress,
+      location: tempLocation,
+      suggestion: tempSuggestion,
+    });
     closeFilter();
+    router.refresh(); // Refresh to fetch new events based on the updated location
   };
 
   const handleCategoryChange = (event: any) => {
@@ -129,27 +142,22 @@ export default function CategoryGrid({ window }: Props) {
     setIsMapView(!isMapView);
   };
 
+  // Update temporary filter state on suggestion change
   const handleAddressChange = (event: any, newValue: any) => {
     if (typeof newValue !== "string" && newValue != null) {
-      setFilterState({
-        address: newValue.label,
-        location: { lat: newValue.lat, lng: newValue.lon },
-        suggestion: newValue,
-      });
+      setTempAddress(newValue.label);
+      setTempLocation({ lat: newValue.lat, lng: newValue.lon });
+      setTempSuggestion(newValue);
     } else if (newValue === null) {
-      setFilterState({
-        address: "",
-        location: null,
-        suggestion: null,
-      });
+      setTempAddress("");
+      setTempLocation(null);
+      setTempSuggestion(null);
     }
   };
 
+  // Update temporary filter state on input change
   const handleInputChange = (event: any, newInputValue: string) => {
-    setFilterState({
-      ...filterState,
-      address: newInputValue,
-    });
+    setTempAddress(newInputValue);
     fetchSuggestions(newInputValue);
   };
 
@@ -259,7 +267,7 @@ export default function CategoryGrid({ window }: Props) {
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option.label
             }
-            value={filterState.suggestion || filterState.address}
+            value={tempSuggestion || tempAddress}
             onChange={handleAddressChange}
             onInputChange={handleInputChange}
             renderInput={(params) => (
@@ -290,5 +298,4 @@ export default function CategoryGrid({ window }: Props) {
       </Dialog>
     </Box>
   );
-  // Removed the redundant setIsFilterOpen function.
 }

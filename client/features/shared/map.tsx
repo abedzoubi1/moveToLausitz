@@ -117,7 +117,11 @@ export const MapView = ({ category, entities }: MapViewProps) => {
 
   useEffect(() => {
     // Prefer current home location from filterState over entities if available.
-    if (filterState.location) {
+    if (
+      filterState.location &&
+      filterState.location.lat != null &&
+      filterState.location.lng != null
+    ) {
       setMapCenter([filterState.location.lat, filterState.location.lng]);
     } else if (entities.length > 0) {
       setMapCenter([entities[0].latitude, entities[0].longitude]);

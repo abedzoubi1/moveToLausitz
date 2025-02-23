@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { Container, Grid, Box } from "@mui/material";
 import { SpotCard } from "../../shared/spot-card";
 import { Event } from "./types";
 import { getEvents } from "../api/get-events";
 import { MapView } from "@/features/shared/map";
+import { useFilter } from "@/context/FilterContext";
+
 interface EventGridProps {
   isMapView: boolean;
 }
@@ -46,11 +48,15 @@ export const EventGrid = ({ isMapView }: EventGridProps) => {
   const [centers, setSpots] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { filterState } = useFilter();
 
   useEffect(() => {
     const fetchCenters = async () => {
       try {
-        const data = await getEvents();
+        const data = await getEvents(
+          filterState.location!.lng,
+          filterState.location!.lat
+        );
         setSpots(data);
       } catch (err) {
         if (err instanceof Error) {
@@ -64,7 +70,7 @@ export const EventGrid = ({ isMapView }: EventGridProps) => {
     };
 
     fetchCenters();
-  }, []);
+  }, [filterState]);
 
   if (loading) {
     return <div>Loading...</div>;
