@@ -35,7 +35,6 @@ import {
 } from "@mui/icons-material";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useSupabase } from "@/utils/supabase";
 import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = "https://nwnppjevoiqqnwegsmvr.supabase.co";
 const supabaseKey =
@@ -81,7 +80,6 @@ export default function TouristInfoPage() {
       try {
         setLoading(true);
 
-        Get user's location
         const position = await new Promise<GeolocationPosition>(
           (resolve, reject) => {
             navigator.geolocation.getCurrentPosition(resolve, reject);

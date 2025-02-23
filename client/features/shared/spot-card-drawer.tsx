@@ -46,7 +46,6 @@ export const SpotDrawer = ({
   onClose,
   item,
   images,
-  currentCoords,
 }: ColtureSpotDrawerProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const { filterState } = useFilter();
