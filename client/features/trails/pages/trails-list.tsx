@@ -4,6 +4,7 @@ import { SpotCard } from "../../shared/spot-card";
 import { getTrails } from "../api/get-trails";
 import { Trails, location } from "./types";
 import { MapView } from "@/features/shared/map";
+import { useFilter } from "@/context/FilterContext";
 
 interface TrailGridProps {
   isMapView: boolean;
@@ -54,11 +55,15 @@ export const TrailGrid = ({ isMapView }: TrailGridProps) => {
   const [centers, setSpots] = useState<Trails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { filterState } = useFilter();
 
   useEffect(() => {
     const fetchCenters = async () => {
       try {
-        const data = await getTrails();
+        const data = await getTrails(
+          filterState.location!.lng,
+          filterState.location!.lat
+        );
         setSpots(data);
       } catch (err) {
         if (err instanceof Error) {
@@ -72,7 +77,7 @@ export const TrailGrid = ({ isMapView }: TrailGridProps) => {
     };
 
     fetchCenters();
-  }, []);
+  }, [filterState]);
 
   if (loading) {
     return <div>Loading...</div>;
