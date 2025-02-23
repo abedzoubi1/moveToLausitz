@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import dynamic from "next/dynamic";
 import {
   IconButton,
@@ -24,7 +24,7 @@ const MapComponent = dynamic(
   { ssr: false }
 );
 
-export default function NavigationPage() {
+function NavigationPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { filterState } = useFilter();
@@ -72,8 +72,6 @@ export default function NavigationPage() {
     setDrawerOpen(!drawerOpen);
   };
 
-  // Content for the Drawer – displays route details if available.
-  // Removed the back IconButton from here.
   const drawerContent = (
     <Box sx={{ width: isMobile ? 250 : 300, p: 2, pt: 8 }}>
       <Typography variant="h6" sx={{ mt: 2 }} gutterBottom>
@@ -112,7 +110,6 @@ export default function NavigationPage() {
         flexDirection: "column",
       }}
     >
-      {/* Back button fixed to top-left of the viewport */}
       <IconButton
         edge="start"
         sx={{
@@ -166,12 +163,21 @@ export default function NavigationPage() {
               <Typography variant="h6">Missing Coordinates</Typography>
               <Typography variant="body1">
                 Please provide <code>currentLat</code>, <code>currentLon</code>,
-                <code>goalLat</code> and <code>goalLon</code> in the URL query.
+                <code>goalLat</code>, and <code>goalLon</code> in the URL query.
               </Typography>
             </Box>
           )}
         </Box>
       </Box>
     </div>
+  );
+}
+
+// ✅ Wrap in Suspense to avoid Next.js error
+export default function NavigationPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NavigationPageContent />
+    </Suspense>
   );
 }
