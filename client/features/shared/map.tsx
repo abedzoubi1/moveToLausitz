@@ -27,6 +27,14 @@ const CustomZoomControl = ({
   return null;
 };
 
+const RecenterMap = ({ center }: { center: [number, number] }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(center);
+  }, [center, map]);
+  return null;
+};
+
 const initializeLeaflet = async () => {
   const L = (await import("leaflet")).default;
   await import("leaflet.awesome-markers");
@@ -167,6 +175,8 @@ export const MapView = ({ category, entities }: MapViewProps) => {
             zoomControl={false}
             style={{ height: "100%", width: "100%", padding: 0, margin: 0 }}
           >
+            <RecenterMap center={mapCenter} />
+
             <CustomZoomControl position="bottomright" />
 
             <TileLayer
