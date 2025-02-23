@@ -9,6 +9,7 @@ import "leaflet.awesome-markers/dist/leaflet.awesome-markers.css";
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
+import { useFilter } from "@/context/FilterContext";
 
 const CustomZoomControl = ({
   position = "bottomright",
@@ -62,6 +63,11 @@ const initializeLeaflet = async () => {
       markerColor: "green",
       prefix: "fa",
     }),
+    home: L.AwesomeMarkers.icon({
+      icon: "home",
+      markerColor: "red",
+      prefix: "fa",
+    }),
   };
 };
 
@@ -92,6 +98,7 @@ export const MapView = ({ category, entities }: MapViewProps) => {
   const [mapCenter, setMapCenter] = useState<[number, number] | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [categoryIcons, setCategoryIcons] = useState<any>(null);
+  const { filterState } = useFilter();
 
   useEffect(() => {
     // Initialize Leaflet and awesome-markers only on client-side
@@ -109,11 +116,13 @@ export const MapView = ({ category, entities }: MapViewProps) => {
   }, []);
 
   useEffect(() => {
-    // Set initial map center when entities are available
-    if (entities.length > 0) {
+    // Prefer current home location from filterState over entities if available.
+    if (filterState.location) {
+      setMapCenter([filterState.location.lat, filterState.location.lng]);
+    } else if (entities.length > 0) {
       setMapCenter([entities[0].latitude, entities[0].longitude]);
     }
-  }, [entities]);
+  }, [entities, filterState]);
 
   const handleMarkerClick = (entity: any) => {
     setSelectedEntity(entity);
@@ -160,6 +169,14 @@ export const MapView = ({ category, entities }: MapViewProps) => {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
+            {filterState.location && (
+              <Marker
+                position={[filterState.location.lat, filterState.location.lng]}
+                icon={categoryIcons["home"]}
+              >
+                {" "}
+              </Marker>
+            )}
 
             <MarkerClusterGroup
               animate={true}

@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
+import { FilterProvider } from "@/context/FilterContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="de">
       <body className={inter.className}>
-        <main>{children}</main>
+        <FilterProvider>{children}</FilterProvider>
       </body>
     </html>
   );

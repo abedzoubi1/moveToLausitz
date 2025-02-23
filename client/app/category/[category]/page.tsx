@@ -1,3 +1,4 @@
+//// filepath: /Users/abdelrazekzoubi/Desktop/Dev-Thesis/moveToLausitz/client/app/category/[category]/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -21,13 +22,7 @@ import {
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
-import {
-  ArrowBack,
-  FilterList,
-  Height,
-  Map,
-  ViewList,
-} from "@mui/icons-material";
+import { ArrowBack, FilterList, Map, ViewList } from "@mui/icons-material";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import TouristGridExample from "@/features/tourist-info/pages/tourist-info-list";
@@ -36,6 +31,7 @@ import FoodEstablishmentsGrid from "@/features/food/pages/food-establishments-li
 import AccommodationsGrid from "@/features/accommodation/pages/accommodation-card-list";
 import EventGrid from "@/features/events/pages/events-list";
 import TrailGrid from "@/features/trails/pages/trails-list";
+import { useFilter } from "@/context/FilterContext";
 
 const categories = [
   {
@@ -57,15 +53,6 @@ interface Suggestion {
   id: string;
 }
 
-interface FilterState {
-  address: string;
-  location: {
-    lat: number;
-    lng: number;
-  } | null;
-  suggestion: Suggestion | null;
-}
-
 interface Props {
   window?: () => Window;
 }
@@ -77,19 +64,14 @@ export default function CategoryGrid({ window }: Props) {
     categories.find((cat) => cat.value === category) || categories[0];
   const [isMapView, setIsMapView] = useState(true);
   const [category1, setCategory] = useState(category);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // Filter state
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  // Global filter state from context
+  const { filterState, setFilterState } = useFilter();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-  const [filterState, setFilterState] = useState<FilterState>({
-    address: "",
-    location: null,
-    suggestion: null,
-  });
-
   const NEXT_PUBLIC_locationiq_api_key =
     process.env.NEXT_PUBLIC_locationiq_api_key;
 
@@ -134,7 +116,6 @@ export default function CategoryGrid({ window }: Props) {
   const closeFilter = () => setIsFilterOpen(false);
 
   const applyFilter = () => {
-    // Only close the dialog, maintaining the filter state
     closeFilter();
   };
 
@@ -156,7 +137,6 @@ export default function CategoryGrid({ window }: Props) {
         suggestion: newValue,
       });
     } else if (newValue === null) {
-      // Clear the filter when the user removes the selection
       setFilterState({
         address: "",
         location: null,
@@ -166,10 +146,10 @@ export default function CategoryGrid({ window }: Props) {
   };
 
   const handleInputChange = (event: any, newInputValue: string) => {
-    setFilterState((prev) => ({
-      ...prev,
+    setFilterState({
+      ...filterState,
       address: newInputValue,
-    }));
+    });
     fetchSuggestions(newInputValue);
   };
 
@@ -310,4 +290,5 @@ export default function CategoryGrid({ window }: Props) {
       </Dialog>
     </Box>
   );
+  // Removed the redundant setIsFilterOpen function.
 }
