@@ -51,6 +51,7 @@ interface Suggestion {
   lon: number;
   id: string;
 }
+export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 export default function CategoryGrid() {
   const params = useParams();
