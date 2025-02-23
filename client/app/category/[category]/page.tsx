@@ -52,11 +52,7 @@ interface Suggestion {
   id: string;
 }
 
-interface Props {
-  window?: () => Window;
-}
-
-export default function CategoryGrid({ window }: Props) {
+export default function CategoryGrid() {
   const params = useParams();
   const category = params.category as string;
   const currentCategory =
