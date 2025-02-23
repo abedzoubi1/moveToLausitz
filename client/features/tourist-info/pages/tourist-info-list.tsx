@@ -4,6 +4,7 @@ import { TouristInfoCard } from "./tourist-info-card";
 import { TouristInfoCenter } from "./types";
 import { getTouristInfoSpots } from "../api/get-tourists";
 import { MapView } from "@/features/shared/map";
+import { useFilter } from "@/context/FilterContext";
 
 interface TouristGridProps {
   isMapView: boolean;
@@ -41,11 +42,15 @@ export const TouristGridExample = ({ isMapView }: TouristGridProps) => {
   const [centers, setCenters] = useState<TouristInfoCenter[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { filterState } = useFilter();
 
   useEffect(() => {
     const fetchCenters = async () => {
       try {
-        const data = await getTouristInfoSpots();
+        const data = await getTouristInfoSpots(
+          filterState.location!.lng,
+          filterState.location!.lat
+        );
         setCenters(data);
       } catch (err) {
         if (err instanceof Error) {
@@ -59,7 +64,7 @@ export const TouristGridExample = ({ isMapView }: TouristGridProps) => {
     };
 
     fetchCenters();
-  }, []);
+  }, [filterState]);
 
   if (loading) {
     return <div>Loading...</div>;
