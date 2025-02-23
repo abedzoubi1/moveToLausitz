@@ -4,6 +4,7 @@ import { SpotCard } from "../../shared/spot-card";
 import { lodgingBusiness } from "./types";
 import { getAccommodation } from "../api/get-accommodations";
 import { MapView } from "@/features/shared/map";
+import { useFilter } from "@/context/FilterContext";
 
 interface AccommodationGridProps {
   isMapView: boolean;
@@ -32,6 +33,7 @@ const AccommodationG = ({
           {accommodations.map((accommodations, index) => (
             <Grid item xs={4} sm={4} md={4} key={index}>
               <SpotCard
+                schedule={undefined}
                 type_of_trail={undefined}
                 distance={undefined}
                 opening_hours={""}
@@ -50,11 +52,15 @@ export const AccommodationsGrid = ({ isMapView }: AccommodationGridProps) => {
   const [centers, setSpots] = useState<lodgingBusiness[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { filterState } = useFilter();
 
   useEffect(() => {
     const fetchCenters = async () => {
       try {
-        const data = await getAccommodation();
+        const data = await getAccommodation(
+          filterState.location!.lng,
+          filterState.location!.lat
+        );
         setSpots(data);
       } catch (err) {
         if (err instanceof Error) {
