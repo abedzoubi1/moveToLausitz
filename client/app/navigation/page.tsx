@@ -15,6 +15,7 @@ import {
 import { createTheme } from "@mui/material/styles";
 import { ArrowBack } from "@mui/icons-material";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useFilter } from "@/context/FilterContext";
 
 const theme = createTheme();
 
@@ -26,6 +27,7 @@ const MapComponent = dynamic(
 export default function NavigationPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { filterState } = useFilter();
 
   const currentLat = searchParams.get("currentLat")
     ? Number(searchParams.get("currentLat"))

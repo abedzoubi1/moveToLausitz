@@ -31,6 +31,7 @@ import { OpeningHours } from "./oppeningHouers";
 import { cultureSpot } from "../culture/pages/types";
 import { parseSchedule } from "./func";
 import { useRouter } from "next/navigation";
+import { useFilter } from "@/context/FilterContext";
 
 interface ColtureSpotDrawerProps {
   open: boolean;
@@ -48,7 +49,9 @@ export const SpotDrawer = ({
   currentCoords,
 }: ColtureSpotDrawerProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
-  const navigationHref = `/navigation?currentLat=${currentCoords.lat}&currentLon=${currentCoords.lon}&goalLat=${item.latitude}&goalLon=${item.longitude}`;
+  const { filterState } = useFilter();
+
+  const navigationHref = `/navigation?currentLat=${filterState!.location?.lat}&currentLon=${filterState!.location?.lng}&goalLat=${item.latitude}&goalLon=${item.longitude}`;
   const router = useRouter(); // initialize router from next/navigation
 
   return (
