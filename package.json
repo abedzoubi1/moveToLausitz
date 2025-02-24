@@ -16,7 +16,7 @@
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@supabase/ssr": "latest",
-    "@supabase/supabase-js": "latest",
+    "@supabase/supabase-js": "^2.49.1",
     "@types/leaflet-routing-machine": "^3.2.8",
     "@types/react-map-gl": "^6.1.7",
     "class-variance-authority": "^0.7.0",

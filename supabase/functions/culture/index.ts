@@ -1,7 +1,5 @@
-import { open } from "node:fs";
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js";
-import { OPEN } from "../../../../../../Library/Caches/deno/npm/registry.npmjs.org/@types/ws/8.5.13/index.d.ts";
 
 const supabaseUrl = Deno.env.get("SB_URL")?.toString() || "";
 const supabaseKey = Deno.env.get("SB_KEY")?.toString() || "";
@@ -36,8 +34,9 @@ Deno.serve(async () => {
     const data = await fetchEvents();
     return new Response(JSON.stringify({ data }), { status: 200 });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error
+      ? error.message
+      : "Unknown error";
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
     });
@@ -77,30 +76,24 @@ const fetchEvents = async () => {
       const cultureSpot: cultureSpot = {
         external_id: id,
         type: data[0]["@type"]?.join(", "),
-        name:
-          data[0]["https://schema.org/name"]?.find(
-            (name: any) => name["@language"] === "de"
-          )?.["@value"] || null,
-        address:
-          data[0]["https://schema.org/address"]?.[
-            "https://schema.org/streetAddress"
-          ] || null,
-        locality:
-          data[0]["https://schema.org/address"]?.[
-            "https://schema.org/addressLocality"
-          ] || null,
-        postal_code:
-          data[0]["https://schema.org/address"]?.[
-            "https://schema.org/postalCode"
-          ] || null,
-        country:
-          data[0]["https://schema.org/address"]?.[
-            "https://schema.org/addressCountry"
-          ] || null,
-        description:
-          data[0]["https://schema.org/description"]?.find(
-            (desc: any) => desc["@language"] === "de"
-          )?.["@value"] || null,
+        name: data[0]["https://schema.org/name"]?.find(
+          (name: any) => name["@language"] === "de",
+        )?.["@value"] || null,
+        address: data[0]["https://schema.org/address"]?.[
+          "https://schema.org/streetAddress"
+        ] || null,
+        locality: data[0]["https://schema.org/address"]?.[
+          "https://schema.org/addressLocality"
+        ] || null,
+        postal_code: data[0]["https://schema.org/address"]?.[
+          "https://schema.org/postalCode"
+        ] || null,
+        country: data[0]["https://schema.org/address"]?.[
+          "https://schema.org/addressCountry"
+        ] || null,
+        description: data[0]["https://schema.org/description"]?.find(
+          (desc: any) => desc["@language"] === "de",
+        )?.["@value"] || null,
         latitude:
           data[0]["https://schema.org/geo"]?.["https://schema.org/latitude"]?.[
             "@value"
@@ -111,22 +104,20 @@ const fetchEvents = async () => {
           ] || null,
         telephone: data[0]["https://schema.org/telephone"] || null,
         url: data[0]["https://schema.org/url"]?.["@value"] || null,
-        license:
-          data[0]["https://schema.org/sdLicense"]?.[
-            "https://schema.org/license"
-          ]?.["@value"] || null,
+        license: data[0]["https://schema.org/sdLicense"]?.[
+          "https://schema.org/license"
+        ]?.["@value"] || null,
         images: extractImages(data[0]["https://schema.org/image"]) || null,
         opening_hours: JSON.stringify(
           extractOpeningHours(
-            data[0]["https://schema.org/openingHoursSpecification"]
-          )
+            data[0]["https://schema.org/openingHoursSpecification"],
+          ),
         ),
         keywords:
           extractGermanKeywords(data[0]["https://schema.org/keywords"]) || "",
-        publisher:
-          data[0]["https://schema.org/sdPublisher"]?.[
-            "https://schema.org/name"
-          ] || null,
+        publisher: data[0]["https://schema.org/sdPublisher"]?.[
+          "https://schema.org/name"
+        ] || null,
         is_accessible_for_free:
           data[0]["https://schema.org/isAccessibleForFree"]?.["@value"] || null,
       };
@@ -153,7 +144,7 @@ const fetchEvents = async () => {
         },
         {
           onConflict: "external_id",
-        }
+        },
       );
       results.push(cultureSpot);
     } catch (error) {
@@ -173,7 +164,7 @@ interface OpeningHoursSpec {
 }
 
 function extractOpeningHours(
-  specifications: OpeningHoursSpec[] | undefined
+  specifications: OpeningHoursSpec[] | undefined,
 ): string {
   if (!specifications || !Array.isArray(specifications)) return "{}";
 
@@ -187,16 +178,15 @@ function extractOpeningHours(
   });
 
   // Get most recent valid or future specification
-  const currentSpec =
-    sortedSpecs.find((spec) => {
-      const validFrom = new Date(
-        spec["https://schema.org/validFrom"]["@value"]
-      );
-      const validThrough = new Date(
-        spec["https://schema.org/validThrough"]["@value"]
-      );
-      return validThrough >= now;
-    }) || sortedSpecs[0];
+  const currentSpec = sortedSpecs.find((spec) => {
+    const validFrom = new Date(
+      spec["https://schema.org/validFrom"]["@value"],
+    );
+    const validThrough = new Date(
+      spec["https://schema.org/validThrough"]["@value"],
+    );
+    return validThrough >= now;
+  }) || sortedSpecs[0];
 
   if (!currentSpec) return "{}";
 
@@ -204,11 +194,11 @@ function extractOpeningHours(
   const schedule: Record<string, string> = {};
   const opens = currentSpec["https://schema.org/opens"]["@value"].substring(
     0,
-    5
+    5,
   );
   const closes = currentSpec["https://schema.org/closes"]["@value"].substring(
     0,
-    5
+    5,
   );
 
   currentSpec["https://schema.org/dayOfWeek"].forEach((day) => {
@@ -225,7 +215,7 @@ const extractGermanKeywords = (keywords?: any[]) => {
   return keywords
     .filter(
       (keyword: { "@language": string; "@value": string }) =>
-        keyword["@language"] === "de"
+        keyword["@language"] === "de",
     )
     .map((keyword) => keyword["@value"] || "")
     .filter(Boolean)
@@ -240,7 +230,7 @@ const extractImages = (images?: any[]) => {
 
   if (!Array.isArray(images)) {
     return [images["https://schema.org/contentUrl"]?.["@value"]].filter(
-      Boolean
+      Boolean,
     );
   }
 
