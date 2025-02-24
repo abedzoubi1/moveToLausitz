@@ -5,6 +5,5 @@
       "src": "client/package.json",
       "use": "@vercel/next"
     }
-  ],
-  "routes": [{ "src": "/[^.]+", "dest": "/", "status": 200 }]
+  ]
 }
