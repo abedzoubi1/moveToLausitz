@@ -191,7 +191,7 @@ export default function HomaPage() {
             },
             {
               id: 3,
-              title: "Gasthaus Wotschofska",
+              title: "Gasthaus Wotschofska.",
               image:
                 "https://img.ecmaps.de/remote/.jpg?project=dzt&mode=max&width=1920&height=1920&url=http://backoffice2.reiseland-brandenburg.de/rpcServer/public/file/get/id/184617",
             },
