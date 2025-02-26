@@ -22,7 +22,7 @@ import {
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
-import { ArrowBack, FilterList, Map, ViewList } from "@mui/icons-material";
+import { ArrowBack, Map, ViewList, EditLocation } from "@mui/icons-material";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import TouristGridExample from "@/features/tourist-info/pages/tourist-info-list";
@@ -212,7 +212,7 @@ export default function CategoryGrid() {
             ))}
           </Select>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Tooltip title="Filter">
+            <Tooltip title="Adresse auswählen">
               <IconButton
                 color="inherit"
                 onClick={openFilter}
@@ -222,10 +222,10 @@ export default function CategoryGrid() {
                   gap: 0.5, // reduced gap between icon and label
                 }}
               >
-                <FilterList />
+                <EditLocation />
                 {!isMobile && (
                   <Typography variant="body1" color="inherit">
-                    Filter
+                    Adresse
                   </Typography>
                 )}
               </IconButton>
@@ -279,7 +279,7 @@ export default function CategoryGrid() {
       </Container>
       <Dialog open={isFilterOpen} onClose={closeFilter} fullWidth maxWidth="sm">
         <DialogTitle sx={{ bgcolor: "rgb(145, 193, 84)", color: "white" }}>
-          Filter
+          Adresse ändern
         </DialogTitle>
         <DialogContent sx={{ p: 3 }}>
           <Autocomplete
@@ -295,7 +295,7 @@ export default function CategoryGrid() {
               <TextField
                 {...params}
                 sx={{ mt: 2 }}
-                label="Address"
+                label="Adresse"
                 variant="outlined"
               />
             )}
