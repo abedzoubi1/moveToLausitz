@@ -35,7 +35,7 @@ import { useFilter } from "@/context/FilterContext";
 const categories = [
   {
     value: "tourist-info",
-    label: "Turist-Informationzentren",
+    label: "Tourist-Informationzentren",
     color: "#1e88e5",
   },
   { value: "events", label: "Veranstaltungen", color: "#e53935" },

@@ -119,33 +119,36 @@ export default function CarouselSection({
               },
             }}
           >
-            <CardMedia
-              component="img"
-              sx={{
-                height: 200,
-                objectFit: "cover",
-                aspectRatio: "16/9",
-                backgroundColor: "grey.100",
-              }}
-              image={item.image}
-              alt={item.title}
-              loading="lazy"
-            />
-            <CardContent sx={{ height: 80, overflow: "hidden" }}>
-              <Typography
-                variant="h6"
+            <Link key={item.id} href={`/category/${table}`} passHref>
+              <CardMedia
+                component="img"
                 sx={{
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  display: "-webkit-box",
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: "vertical",
-                  lineHeight: 1.2,
+                  height: 200,
+                  objectFit: "cover",
+                  aspectRatio: "16/9",
+                  backgroundColor: "grey.100",
                 }}
-              >
-                {item.title}
-              </Typography>
-            </CardContent>
+                image={item.image}
+                alt={item.title}
+                loading="lazy"
+              />
+
+              <CardContent sx={{ height: 80, overflow: "hidden" }}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {item.title}
+                </Typography>
+              </CardContent>
+            </Link>
           </Card>
         ))}
       </Box>
