@@ -13,6 +13,7 @@ import {
   Toolbar,
   Link,
   Drawer,
+  Button,
 } from "@mui/material";
 import {
   Favorite,
@@ -27,6 +28,8 @@ import { TouristInfoCenter } from "./types";
 import { ImageSlider } from "./ImageSlider";
 import { ReadMoreText } from "./ReadMore";
 import { OpeningHours } from "./oppeningHouers";
+import { useFilter } from "@/context/FilterContext";
+import { useRouter } from "next/navigation";
 interface TouristInfoDrawerProps {
   open: boolean;
   onClose: () => void;
@@ -41,6 +44,10 @@ export const TouristInfoDrawer = ({
   images,
 }: TouristInfoDrawerProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
+  const { filterState } = useFilter();
+
+  const navigationHref = `/navigation?currentLat=${filterState!.location?.lat}&currentLon=${filterState!.location?.lng}&goalLat=${item.latitude}&goalLon=${item.longitude}`;
+  const router = useRouter(); // initialize router from next
 
   return (
     <Drawer
@@ -65,7 +72,7 @@ export const TouristInfoDrawer = ({
 
       <ImageSlider images={images} />
 
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 3, pb: 11 }}>
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>
           {item.name}
         </Typography>
@@ -173,6 +180,45 @@ export const TouristInfoDrawer = ({
             </>
           )}
         </List>
+        <Box
+          sx={{
+            position: "fixed",
+            bottom: 24,
+            right: 24,
+            zIndex: 1300,
+            boxShadow: "none",
+            backgroundColor: "transparent",
+          }}
+        >
+          <Button
+            variant="contained"
+            onClick={() => router.push(navigationHref)}
+            sx={{
+              bgcolor: "rgb(145, 193, 84)",
+              color: "white",
+              fontSize: "1.2rem",
+              fontWeight: "bold",
+              borderRadius: 2,
+              textTransform: "none",
+              px: 4,
+              py: 2,
+              border: "none", // remove any border
+              outline: "none", // disable outline
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+              "&:hover": {
+                bgcolor: "rgb(130, 173, 77)",
+                boxShadow: "0px 6px 16px rgba(0, 0, 0, 0.3)",
+              },
+              "&:focus": {
+                outline: "none",
+                border: "none",
+                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+              },
+            }}
+          >
+            Anreise
+          </Button>
+        </Box>
       </Box>
     </Drawer>
   );

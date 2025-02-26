@@ -74,7 +74,7 @@ export const SpotDrawer = ({
         </Toolbar>
       </AppBar>
       <ImageSlider images={images} />
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 3, pb: 11 }}>
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 700 }}>
           {item.name}
         </Typography>
@@ -244,7 +244,7 @@ export const SpotDrawer = ({
           bottom: 24,
           right: 24,
           zIndex: 1300,
-          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+          boxShadow: "none",
         }}
       >
         <Button
