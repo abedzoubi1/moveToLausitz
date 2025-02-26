@@ -308,6 +308,7 @@ export default function CategoryGrid() {
           <MUIButton
             onClick={applyFilter}
             variant="contained"
+            disabled={!tempSuggestion}
             sx={{
               bgcolor: "rgb(145, 193, 84)",
               "&:hover": { bgcolor: "rgb(130, 173, 77)" },
