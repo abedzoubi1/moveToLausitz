@@ -18,6 +18,7 @@ import {
   DialogContent,
   DialogActions,
   Button as MUIButton,
+  Typography,
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
@@ -212,8 +213,21 @@ export default function CategoryGrid() {
           </Select>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Tooltip title="Filter">
-              <IconButton color="inherit" onClick={openFilter}>
+              <IconButton
+                color="inherit"
+                onClick={openFilter}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5, // reduced gap between icon and label
+                }}
+              >
                 <FilterList />
+                {!isMobile && (
+                  <Typography variant="body1" color="inherit">
+                    Filter
+                  </Typography>
+                )}
               </IconButton>
             </Tooltip>
             <Tooltip title={isMapView ? "Liste anzeigen" : "Karte anzeigen"}>
@@ -221,8 +235,18 @@ export default function CategoryGrid() {
                 onClick={toggleView}
                 color="inherit"
                 aria-label={isMapView ? "Liste" : "Karte"}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                }}
               >
                 {isMapView ? <ViewList /> : <Map />}
+                {!isMobile && (
+                  <Typography variant="body1" color="inherit">
+                    {isMapView ? "Liste" : "Karte"}
+                  </Typography>
+                )}
               </IconButton>
             </Tooltip>
           </Box>
