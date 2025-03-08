@@ -81,18 +81,18 @@ function NavigationPageContent() {
         <List>
           <ListItem>
             <ListItemText
-              primary="Driving Leg"
-              secondary={`Distance: ${routeDetails.driving.distance.toFixed(
+              primary="Fahrtroute zum Parkplatz"
+              secondary={`Entfernung: ${routeDetails.driving.distance.toFixed(
                 2
-              )} km, Time: ${routeDetails.driving.time} min`}
+              )} km, Zeit: ${routeDetails.driving.time} min`}
             />
           </ListItem>
           <ListItem>
             <ListItemText
-              primary="Walking Leg"
-              secondary={`Distance: ${routeDetails.walking.distance.toFixed(
+              primary="Fußweg vom Parkplatz zum Ziel"
+              secondary={`Entfernung: ${routeDetails.walking.distance.toFixed(
                 2
-              )} km, Time: ${routeDetails.walking.time} min`}
+              )} km, Zeit: ${routeDetails.walking.time} min`}
             />
           </ListItem>
         </List>
