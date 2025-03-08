@@ -216,7 +216,7 @@ export const TouristInfoDrawer = ({
               },
             }}
           >
-            Anreise
+            Parkplatz finden
           </Button>
         </Box>
       </Box>

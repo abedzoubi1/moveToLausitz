@@ -266,7 +266,7 @@ export const SpotDrawer = ({
             },
           }}
         >
-          Anreise
+          Parkplatz finden
         </Button>
       </Box>
     </Drawer>

@@ -64,7 +64,7 @@ export default function CategoryGrid() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const router = useRouter();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"), { noSsr: true });
 
   // Global filter state from context
   const { filterState, setFilterState } = useFilter();
