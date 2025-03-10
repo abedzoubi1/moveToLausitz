@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, use, useEffect } from "react";
 import dynamic from "next/dynamic";
 import {
   IconButton,
@@ -11,6 +11,7 @@ import {
   ListItemText,
   Box,
   useMediaQuery,
+  Alert,
 } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import { ArrowBack } from "@mui/icons-material";
@@ -28,6 +29,7 @@ function NavigationPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { filterState } = useFilter();
+  const [alertOpen, setAlertOpen] = useState(true);
 
   const currentLat = searchParams.get("currentLat")
     ? Number(searchParams.get("currentLat"))
@@ -71,6 +73,11 @@ function NavigationPageContent() {
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
   };
+  useEffect(() => {
+    if (routeDetails && routeDetails.walking.distance === -1) {
+      setAlertOpen(true);
+    }
+  }, [routeDetails]);
 
   const drawerContent = (
     <Box sx={{ width: isMobile ? 250 : 300, p: 2, pt: 8 }}>
@@ -79,22 +86,35 @@ function NavigationPageContent() {
       </Typography>
       {routeDetails ? (
         <List>
-          <ListItem>
-            <ListItemText
-              primary="Fahrtroute zum Parkplatz"
-              secondary={`Entfernung: ${routeDetails.driving.distance.toFixed(
-                2
-              )} km, Zeit: ${routeDetails.driving.time} min`}
-            />
-          </ListItem>
-          <ListItem>
-            <ListItemText
-              primary="Fußweg vom Parkplatz zum Ziel"
-              secondary={`Entfernung: ${routeDetails.walking.distance.toFixed(
-                2
-              )} km, Zeit: ${routeDetails.walking.time} min`}
-            />
-          </ListItem>
+          {routeDetails.walking.distance === -1 ? (
+            <ListItem>
+              <ListItemText
+                primary="Fahrtroute zum Ziel"
+                secondary={`Entfernung: ${routeDetails.driving.distance.toFixed(
+                  2
+                )} km, Zeit: ${routeDetails.driving.time} min`}
+              />
+            </ListItem>
+          ) : (
+            <>
+              <ListItem>
+                <ListItemText
+                  primary="Fahrtroute zum Parkplatz"
+                  secondary={`Entfernung: ${routeDetails.driving.distance.toFixed(
+                    2
+                  )} km, Zeit: ${routeDetails.driving.time} min`}
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemText
+                  primary="Fußweg vom Parkplatz zum Ziel"
+                  secondary={`Entfernung: ${routeDetails.walking.distance.toFixed(
+                    2
+                  )} km, Zeit: ${routeDetails.walking.time} min`}
+                />
+              </ListItem>
+            </>
+          )}
         </List>
       ) : (
         <Typography variant="body2">Calculating route...</Typography>
@@ -110,6 +130,17 @@ function NavigationPageContent() {
         flexDirection: "column",
       }}
     >
+      {/* if walking distance is -1, then alert user */}
+      {routeDetails && routeDetails.walking.distance === -1 && alertOpen && (
+        <Alert
+          severity="warning"
+          onClose={() => setAlertOpen(false)}
+          sx={{ position: "fixed", top: 16, right: 16, left: 16, zIndex: 1400 }}
+        >
+          Es wurde kein Parkplatz in der Nähe des Ziels gefunden. Bitte
+          überprüfen Sie die Umgebung selbst.
+        </Alert>
+      )}
       <IconButton
         edge="start"
         sx={{
@@ -173,7 +204,6 @@ function NavigationPageContent() {
   );
 }
 
-// ✅ Wrap in Suspense to avoid Next.js error
 export default function NavigationPage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>

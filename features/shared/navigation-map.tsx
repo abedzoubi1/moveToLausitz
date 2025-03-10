@@ -87,6 +87,7 @@ const MapComponent = ({
 
         // Get the closest parking location to the attraction.
         let parkingLocation: [number, number] = [0, 0];
+        let skipParking = true;
         if (isValidCoord(attractionLocation)) {
           const parkings = await getClosestParking(
             attractionLocation![0],
@@ -102,15 +103,25 @@ const MapComponent = ({
                   ? parkings[1]
                   : parkings[2];
             if (free) {
+              //get the parking location
               parkingLocation = [free.latitude!, free.longitude!];
-
-              // Add marker for parking.
-              L.marker(parkingLocation, {
-                icon: parkingIcon,
-                zIndexOffset: 1000,
-              })
-                .addTo(mapRef.current)
-                .bindPopup("Parking Spot");
+              // check if the walking distance is more than 1km
+              const walkingDistanceMeters = L.latLng(
+                parkingLocation[0],
+                parkingLocation[1]
+              ).distanceTo(
+                L.latLng(attractionLocation![0], attractionLocation![1])
+              );
+              if (walkingDistanceMeters < 1000) {
+                // Add marker for parking.
+                skipParking = false;
+                L.marker(parkingLocation, {
+                  icon: parkingIcon,
+                  zIndexOffset: 1000,
+                })
+                  .addTo(mapRef.current)
+                  .bindPopup("Parking Spot");
+              }
             }
           }
         }
@@ -125,80 +136,125 @@ const MapComponent = ({
           }
         };
 
-        // Driving leg: from userLocation to parkingLocation.
+        //check if the route should be to the parking or not
         if (
+          skipParking &&
           isValidCoord(userLocation) &&
-          parkingLocation[0] !== 0 &&
-          parkingLocation[1] !== 0
-        ) {
-          const drivingControl = L.Routing.control({
-            waypoints: [
-              L.latLng(userLocation![0], userLocation![1]),
-              L.latLng(parkingLocation[0], parkingLocation[1]),
-            ],
-            router: L.Routing.osrmv1({
-              serviceUrl: "https://router.project-osrm.org/route/v1",
-              profile: "car",
-            }),
-            lineOptions: {
-              styles: [{ color: "blue", weight: 4 }],
-              extendToWaypoints: false,
-              missingRouteTolerance: 0,
-            },
-            addWaypoints: false,
-            fitSelectedRoutes: true,
-          }).addTo(mapRef.current);
-
-          drivingControl.on("routesfound", (e) => {
-            if (e.routes && e.routes.length > 0) {
-              const summary = e.routes[0].summary;
-              drivingSummary = {
-                distance: (summary.totalDistance || summary.distance) / 1000, // km
-                time: summary.totalTime
-                  ? Math.round(summary.totalTime / 60)
-                  : Math.round(summary.time / 60), // minutes
-              };
-              maybeCallOnRouteFound();
-            }
-          });
-        }
-
-        // Walking leg: from parkingLocation to attractionLocation.
-        if (
-          parkingLocation[0] !== 0 &&
-          parkingLocation[1] !== 0 &&
           isValidCoord(attractionLocation)
         ) {
-          const walkingControl = L.Routing.control({
-            waypoints: [
-              L.latLng(parkingLocation[0], parkingLocation[1]),
-              L.latLng(attractionLocation![0], attractionLocation![1]),
-            ],
-            router: L.Routing.osrmv1({
-              serviceUrl: "https://router.project-osrm.org/route/v1",
-              profile: "foot",
-            }),
-            lineOptions: {
-              styles: [{ color: "green", weight: 4, dashArray: "5, 10" }],
-              extendToWaypoints: false,
-              missingRouteTolerance: 0,
-            },
-            addWaypoints: false,
-            fitSelectedRoutes: true,
-          }).addTo(mapRef.current);
+          // Driving leg: from userLocation to parkingLocation.
+          if (
+            isValidCoord(userLocation) &&
+            parkingLocation[0] !== 0 &&
+            parkingLocation[1] !== 0
+          ) {
+            const drivingControl = L.Routing.control({
+              waypoints: [
+                L.latLng(userLocation![0], userLocation![1]),
+                L.latLng(attractionLocation![0], attractionLocation![1]),
+              ],
+              router: L.Routing.osrmv1({
+                serviceUrl: "https://router.project-osrm.org/route/v1",
+                profile: "car",
+              }),
+              lineOptions: {
+                styles: [{ color: "blue", weight: 4 }],
+                extendToWaypoints: false,
+                missingRouteTolerance: 0,
+              },
+              addWaypoints: false,
+              fitSelectedRoutes: true,
+            }).addTo(mapRef.current);
 
-          walkingControl.on("routesfound", (e: { routes: any[] }) => {
-            if (e.routes && e.routes.length > 0) {
-              const summary = e.routes[0].summary;
-              walkingSummary = {
-                distance: (summary.totalDistance || summary.distance) / 1000, // km
-                time: summary.totalTime
-                  ? Math.round(summary.totalTime / 60)
-                  : Math.round(summary.time / 60), // minutes
-              };
-              maybeCallOnRouteFound();
-            }
-          });
+            drivingControl.on("routesfound", (e) => {
+              if (e.routes && e.routes.length > 0) {
+                const summary = e.routes[0].summary;
+                drivingSummary = {
+                  distance: (summary.totalDistance || summary.distance) / 1000, // km
+                  time: summary.totalTime
+                    ? Math.round(summary.totalTime / 60)
+                    : Math.round(summary.time / 60), // minutes
+                };
+                walkingSummary = { distance: -1, time: 0 };
+                maybeCallOnRouteFound();
+              }
+            });
+          }
+        } else {
+          // Driving leg: from userLocation to parkingLocation.
+          if (
+            isValidCoord(userLocation) &&
+            parkingLocation[0] !== 0 &&
+            parkingLocation[1] !== 0
+          ) {
+            const drivingControl = L.Routing.control({
+              waypoints: [
+                L.latLng(userLocation![0], userLocation![1]),
+                L.latLng(parkingLocation![0], parkingLocation![1]),
+              ],
+              router: L.Routing.osrmv1({
+                serviceUrl: "https://router.project-osrm.org/route/v1",
+                profile: "car",
+              }),
+              lineOptions: {
+                styles: [{ color: "blue", weight: 4 }],
+                extendToWaypoints: false,
+                missingRouteTolerance: 0,
+              },
+              addWaypoints: false,
+              fitSelectedRoutes: true,
+            }).addTo(mapRef.current);
+
+            drivingControl.on("routesfound", (e) => {
+              if (e.routes && e.routes.length > 0) {
+                const summary = e.routes[0].summary;
+                drivingSummary = {
+                  distance: (summary.totalDistance || summary.distance) / 1000, // km
+                  time: summary.totalTime
+                    ? Math.round(summary.totalTime / 60)
+                    : Math.round(summary.time / 60), // minutes
+                };
+                maybeCallOnRouteFound();
+              }
+            });
+          }
+          // Walking leg: from parkingLocation to attractionLocation.
+          if (
+            parkingLocation[0] !== 0 &&
+            parkingLocation[1] !== 0 &&
+            isValidCoord(attractionLocation)
+          ) {
+            const walkingControl = L.Routing.control({
+              waypoints: [
+                L.latLng(parkingLocation[0], parkingLocation[1]),
+                L.latLng(attractionLocation![0], attractionLocation![1]),
+              ],
+              router: L.Routing.osrmv1({
+                serviceUrl: "https://router.project-osrm.org/route/v1",
+                profile: "foot",
+              }),
+              lineOptions: {
+                styles: [{ color: "green", weight: 4, dashArray: "5, 10" }],
+                extendToWaypoints: false,
+                missingRouteTolerance: 0,
+              },
+              addWaypoints: false,
+              fitSelectedRoutes: true,
+            }).addTo(mapRef.current);
+
+            walkingControl.on("routesfound", (e: { routes: any[] }) => {
+              if (e.routes && e.routes.length > 0) {
+                const summary = e.routes[0].summary;
+                walkingSummary = {
+                  distance: (summary.totalDistance || summary.distance) / 1000, // km
+                  time: summary.totalTime
+                    ? Math.round(summary.totalTime / 60)
+                    : Math.round(summary.time / 60), // minutes
+                };
+                maybeCallOnRouteFound();
+              }
+            });
+          }
         }
       }
     };
