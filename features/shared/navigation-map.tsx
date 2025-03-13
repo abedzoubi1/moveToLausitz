@@ -112,6 +112,10 @@ const MapComponent = ({
               ).distanceTo(
                 L.latLng(attractionLocation![0], attractionLocation![1])
               );
+              let popup: string;
+              if (free.free_spots === -1)
+                popup = "keine verfügbaren Daten über freie Plätze";
+              else popup = `${free.free_spots} freie Plätze`;
               if (walkingDistanceMeters < 1000) {
                 // Add marker for parking.
                 skipParking = false;
@@ -120,7 +124,7 @@ const MapComponent = ({
                   zIndexOffset: 1000,
                 })
                   .addTo(mapRef.current)
-                  .bindPopup("Parking Spot");
+                  .bindPopup(popup);
               }
             }
           }
