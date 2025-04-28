@@ -17,8 +17,8 @@ const FilterContext = createContext<FilterContextType | undefined>(undefined);
 
 export const FilterProvider = ({ children }: { children: ReactNode }) => {
   const [filterState, setFilterState] = useState<FilterState>({
-    address: "03229 Altdöbern, Germany",
-    location: { lat: 51.67355, lng: 14.060565 },
+    address: "Sallgast, Elbe-Elster, Brandenburg, Germany",
+    location: { lat: 51.57881225, lng: 13.84758695 },
     suggestion: null,
   });
 
